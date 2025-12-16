@@ -14,6 +14,7 @@ Event Kit is a lightweight innovation kit showcasing:
 - **Telemetry**: Structured JSONL logging for observability
 - **Profile persistence**: Save/load user preferences
 - **External data override**: Swap in real event feeds
+- **Microsoft Graph integration**: Live calendar events with MSAL auth (NEW)
 
 ---
 
@@ -188,16 +189,35 @@ eventkit/
 ├── EVENT_KIT.md             # Quick start overview
 ├── QUICKSTART.md            # Detailed CLI/server usage
 ├── runner.py                # Unified runner for mutually exclusive modes
-├── core.py                  # Importable core functions (recommend, explain)
-├── settings.py              # Pydantic settings (RUN_MODE, API_TOKEN, APP_INSIGHTS_CONNECTION_STRING)
+├── core.py                  # Importable core functions (recommend, explain, recommend_from_graph)
+├── settings.py              # Pydantic settings (includes Graph credentials)
 ├── agent.schema.json        # JSON Schema for manifest validation
-├── tests/                   # Pytest suite (7 tests)
+│
+├── # Microsoft Graph Integration (NEW)
+├── graph_auth.py            # MSAL authentication and token caching
+├── graph_service.py         # Graph API wrapper, event transformation, caching
+├── logging_config.py        # Structured logging with GraphEventLogger
+│
+├── docs/
+│   ├── graph-setup.md       # Complete Graph setup and configuration guide
+│   ├── technical-guide.md   # Architecture and design patterns
+│   └── ...
+│
+├── tests/
 │   ├── test_recommend.py
 │   ├── test_explain.py
 │   ├── test_export.py
 │   ├── test_profile.py
 │   ├── test_server.py
 │   ├── test_telemetry.py
+│   ├── test_graph_auth.py           # Graph auth module tests
+│   ├── test_graph_service.py        # Graph API service tests
+│   ├── test_core_graph.py           # Graph recommendations tests
+│   ├── test_graph_server.py         # /recommend-graph endpoint tests
+│   ├── test_graph_integration.py    # End-to-end integration tests
+│   └── test_logging_config.py       # Logging configuration tests
+├── .env                     # Configuration file (not committed)
+```
 │   └── test_external_sessions.py
 ├── docs/                    # Technical guides
 │   ├── technical-guide.md
