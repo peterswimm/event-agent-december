@@ -1,6 +1,9 @@
-# 🚀 Agent ADK Development Plan - Complete Package
+# 🧭 Documentation Index (Archived)
 
-Welcome! This directory now contains everything needed to scaffold a full **Agent ADK development environment with MSL authentication for Microsoft Graph**.
+This index has been archived. Please use the new entry point:
+
+- Start here: 00-START-HERE.md
+- Quick reference: REFERENCE.md
 
 ## 📚 Documentation Overview
 
