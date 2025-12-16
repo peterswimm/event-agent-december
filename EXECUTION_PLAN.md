@@ -3,18 +3,20 @@
 ## Overview
 
 This plan breaks down the scaffolding work into 40 actionable tasks across 4 phases:
+
 - **Phase 1**: Authentication & Graph API (15 tasks, ~2 weeks)
 - **Phase 2**: Agents SDK Integration (10 tasks, ~1.5 weeks)
 - **Phase 3**: Enterprise & Deployment (10 tasks, ~1.5 weeks)
 - **Phase 4**: Polish & Documentation (5 tasks, ~1 week)
 
-**Total: ~6 weeks of development**
+### Total: ~6 weeks of development
 
 ---
 
 ## How to Execute
 
 ### Daily Workflow
+
 1. Pick 2-3 tasks from current phase
 2. Create a new branch: `git checkout -b feature/task-X-description`
 3. Complete task checklist items
@@ -23,6 +25,7 @@ This plan breaks down the scaffolding work into 40 actionable tasks across 4 pha
 6. Mark task complete here
 
 ### Progress Tracking
+
 - [ ] = Not started
 - [x] = Complete
 - [~] = In progress
@@ -36,8 +39,10 @@ This plan breaks down the scaffolding work into 40 actionable tasks across 4 pha
 **Branch**: `feature/task-1-deps`
 
 **Checklist**:
+
 - [ ] Open [pyproject.toml](pyproject.toml)
 - [ ] Replace `dependencies = []` with:
+
   ```toml
   dependencies = [
       "msal>=1.25.0",
@@ -46,7 +51,9 @@ This plan breaks down the scaffolding work into 40 actionable tasks across 4 pha
       "azure-identity>=1.14.0",
   ]
   ```
+
 - [ ] Add `[project.optional-dependencies]` section:
+
   ```toml
   [project.optional-dependencies]
   dev = [
@@ -56,6 +63,7 @@ This plan breaks down the scaffolding work into 40 actionable tasks across 4 pha
       "responses>=0.23.0",
   ]
   ```
+
 - [ ] Run: `pip install -e ".[dev]"`
 - [ ] Verify: `pip list | grep msal`
 - [ ] Commit: `git add pyproject.toml && git commit -m "chore: add MSAL and Graph dependencies"`
@@ -69,14 +77,17 @@ This plan breaks down the scaffolding work into 40 actionable tasks across 4 pha
 **Branch**: `feature/task-2-settings`
 
 **Checklist**:
+
 - [ ] Update [settings.py](settings.py):
   - Add Graph-related fields with validation
   - Add App Insights field
   - Create `.env` validation method
 - [ ] Create actual `.env` from `.env.example`:
+
   ```bash
   cp .env.example .env
   ```
+
 - [ ] Edit `.env` and set temporary test values
 - [ ] Write test: `tests/test_settings.py`
   - Test missing Graph vars when mode=m365-agent
@@ -84,6 +95,7 @@ This plan breaks down the scaffolding work into 40 actionable tasks across 4 pha
 - [ ] Run: `pytest tests/test_settings.py -v`
 
 **Files to Create**:
+
 - Update: [settings.py](settings.py)
 - Create: [tests/test_settings.py](tests/test_settings.py)
 - Create: `.env` (from `.env.example`)
@@ -97,6 +109,7 @@ This plan breaks down the scaffolding work into 40 actionable tasks across 4 pha
 **Branch**: `feature/task-3-msal-auth`
 
 **Checklist**:
+
 - [ ] Create [graph_auth.py](graph_auth.py) with:
   - `GraphAuthClient` class
   - Token caching to `~/.event_agent_token_cache.json`
@@ -106,6 +119,7 @@ This plan breaks down the scaffolding work into 40 actionable tasks across 4 pha
   - Error handling (InvalidClientError, etc.)
   - Logging statements
 - [ ] Test manual instantiation:
+
   ```python
   from settings import Settings
   from graph_auth import GraphAuthClient
@@ -115,13 +129,16 @@ This plan breaks down the scaffolding work into 40 actionable tasks across 4 pha
   token = auth.get_access_token()
   print(f"Token: {token[:20]}...")
   ```
+
 - [ ] Verify cache file created
 - [ ] Commit changes
 
 **Files to Create**:
+
 - Create: [graph_auth.py](graph_auth.py)
 
 **Dependencies**:
+
 - Task 1 & 2 must be complete
 
 **Success Criteria**: Token acquired & cached successfully
@@ -133,6 +150,7 @@ This plan breaks down the scaffolding work into 40 actionable tasks across 4 pha
 **Branch**: `feature/task-4-auth-tests`
 
 **Checklist**:
+
 - [ ] Create [tests/test_graph_auth.py](tests/test_graph_auth.py)
 - [ ] Mock MSAL ConfidentialClientApplication
 - [ ] Write tests:
@@ -143,6 +161,7 @@ This plan breaks down the scaffolding work into 40 actionable tasks across 4 pha
 - [ ] Run: `pytest tests/test_graph_auth.py -v --cov=graph_auth`
 
 **Files to Create**:
+
 - Create: [tests/test_graph_auth.py](tests/test_graph_auth.py)
 
 **Dependencies**: Task 3 complete
@@ -156,6 +175,7 @@ This plan breaks down the scaffolding work into 40 actionable tasks across 4 pha
 **Branch**: `feature/task-5-graph-service`
 
 **Checklist**:
+
 - [ ] Create [graph_service.py](graph_service.py):
   - `GraphEventService` class
   - `__init__(auth_client, cache_ttl=300)`
@@ -173,6 +193,7 @@ This plan breaks down the scaffolding work into 40 actionable tasks across 4 pha
   - Default `popularity: 0.5`
 - [ ] Add logging for all API calls
 - [ ] Manual test:
+
   ```python
   from graph_auth import GraphAuthClient
   from graph_service import GraphEventService
@@ -184,6 +205,7 @@ This plan breaks down the scaffolding work into 40 actionable tasks across 4 pha
   ```
 
 **Files to Create**:
+
 - Create: [graph_service.py](graph_service.py)
 
 **Dependencies**: Task 3 & 1 complete
@@ -197,6 +219,7 @@ This plan breaks down the scaffolding work into 40 actionable tasks across 4 pha
 **Branch**: `feature/task-6-service-tests`
 
 **Checklist**:
+
 - [ ] Create [tests/test_graph_service.py](tests/test_graph_service.py)
 - [ ] Mock graph_core responses with realistic Graph API JSON
 - [ ] Write tests:
@@ -209,6 +232,7 @@ This plan breaks down the scaffolding work into 40 actionable tasks across 4 pha
 - [ ] Run: `pytest tests/test_graph_service.py -v --cov=graph_service`
 
 **Files to Create**:
+
 - Create: [tests/test_graph_service.py](tests/test_graph_service.py)
 - Create: [tests/fixtures/graph_responses.json](tests/fixtures/graph_responses.json) (mock data)
 
@@ -223,12 +247,14 @@ This plan breaks down the scaffolding work into 40 actionable tasks across 4 pha
 **Branch**: `feature/task-7-core-graph`
 
 **Checklist**:
+
 - [ ] Update [core.py](core.py):
   - Add `recommend_from_graph(user_id, interests, top_n, service) -> Dict`
   - Reuse existing scoring logic
   - Accept `GraphEventService` as parameter
 - [ ] Keep backward compatibility with manifest-based `recommend()`
 - [ ] Test manually:
+
   ```python
   from core import recommend_from_graph
   from graph_service import GraphEventService
@@ -241,6 +267,7 @@ This plan breaks down the scaffolding work into 40 actionable tasks across 4 pha
   ```
 
 **Files to Update**:
+
 - Update: [core.py](core.py)
 
 **Dependencies**: Task 5 complete
@@ -254,19 +281,23 @@ This plan breaks down the scaffolding work into 40 actionable tasks across 4 pha
 **Branch**: `feature/task-8-cli-source`
 
 **Checklist**:
+
 - [ ] Update [agent.py](agent.py) `recommend` command:
   - Add `--source` flag: `manifest` (default) | `graph`
   - Add `--user-id` flag (required if `--source graph`)
   - Conditionally call `recommend()` or `recommend_from_graph()`
 - [ ] Update argparse setup
 - [ ] Test commands:
+
   ```bash
   python agent.py recommend --interests "ai, agents" --top 3
   python agent.py recommend --source graph --user-id "user@tenant.com" --interests "ai, agents" --top 3
   ```
+
 - [ ] Verify both work
 
 **Files to Update**:
+
 - Update: [agent.py](agent.py)
 
 **Dependencies**: Task 7 complete
@@ -280,6 +311,7 @@ This plan breaks down the scaffolding work into 40 actionable tasks across 4 pha
 **Branch**: `feature/task-9-http-graph`
 
 **Checklist**:
+
 - [ ] Update HTTP server handler in [agent.py](agent.py):
   - Add `GET /recommend-graph` endpoint
   - Query params: `user_id`, `interests`, `top`, `card` (optional)
@@ -290,12 +322,14 @@ This plan breaks down the scaffolding work into 40 actionable tasks across 4 pha
   - Wrap in try/catch, return 500 on Graph errors
   - Add to telemetry
 - [ ] Test:
+
   ```bash
   python agent.py serve --port 8010
   curl "http://localhost:8010/recommend-graph?user_id=user@tenant.com&interests=ai,agents&top=3"
   ```
 
 **Files to Update**:
+
 - Update: [agent.py](agent.py)
 
 **Dependencies**: Task 8 complete
@@ -309,6 +343,7 @@ This plan breaks down the scaffolding work into 40 actionable tasks across 4 pha
 **Branch**: `feature/task-10-integration`
 
 **Checklist**:
+
 - [ ] Create [tests/test_graph_integration.py](tests/test_graph_integration.py)
 - [ ] End-to-end test flow:
   1. Mock MSAL token acquisition
@@ -323,6 +358,7 @@ This plan breaks down the scaffolding work into 40 actionable tasks across 4 pha
 - [ ] Run: `pytest tests/test_graph_integration.py -v`
 
 **Files to Create**:
+
 - Create: [tests/test_graph_integration.py](tests/test_graph_integration.py)
 
 **Dependencies**: Tasks 6 & 7 complete
@@ -336,6 +372,7 @@ This plan breaks down the scaffolding work into 40 actionable tasks across 4 pha
 **Branch**: `feature/task-11-observability`
 
 **Checklist**:
+
 - [ ] Update [telemetry.py](telemetry.py):
   - Track Graph API calls with latency
   - Log cache hits/misses
@@ -345,18 +382,22 @@ This plan breaks down the scaffolding work into 40 actionable tasks across 4 pha
   - [graph_auth.py](graph_auth.py): token events
   - [graph_service.py](graph_service.py): API calls, cache, rate limits
 - [ ] Add logging statements:
+
   ```python
   import logging
   logger = logging.getLogger(__name__)
   logger.info("Acquired token", extra={"cached": False, "latency_ms": 45})
   logger.warning("Rate limited, backing off", extra={"retry_after": 60})
   ```
+
 - [ ] Test:
+
   ```bash
   python agent.py recommend --source graph --user-id "user@tenant.com" --interests "ai" 2>&1 | grep -i graph
   ```
 
 **Files to Update**:
+
 - Update: [telemetry.py](telemetry.py)
 - Update: [graph_auth.py](graph_auth.py)
 - Update: [graph_service.py](graph_service.py)
@@ -372,6 +413,7 @@ This plan breaks down the scaffolding work into 40 actionable tasks across 4 pha
 **Branch**: `feature/task-12-docs`
 
 **Checklist**:
+
 - [ ] Create [docs/graph-setup.md](docs/graph-setup.md):
   - Step-by-step app registration in Azure AD
   - Required scopes: `Calendars.Read`, `User.Read`
@@ -386,9 +428,11 @@ This plan breaks down the scaffolding work into 40 actionable tasks across 4 pha
 - [ ] Verify all links work
 
 **Files to Create**:
+
 - Create: [docs/graph-setup.md](docs/graph-setup.md)
 
 **Files to Update**:
+
 - Update: [QUICKSTART.md](QUICKSTART.md)
 - Update: [README.md](README.md)
 
@@ -403,8 +447,10 @@ This plan breaks down the scaffolding work into 40 actionable tasks across 4 pha
 **Branch**: `feature/task-13-local-test`
 
 **Checklist**:
+
 - [ ] Populate real `.env` with Azure AD test app credentials
 - [ ] Test sequence:
+
   ```bash
   # Test manifest mode still works
   python agent.py recommend --interests "ai, agents" --top 2
@@ -422,6 +468,7 @@ This plan breaks down the scaffolding work into 40 actionable tasks across 4 pha
   python agent.py recommend --source graph --user-id "user@tenant.com" --interests "ai" --top 1
   # Should use cached token on second call (faster)
   ```
+
 - [ ] Verify telemetry logged correctly
 
 **Dependencies**: Tasks 1-12 complete
@@ -435,6 +482,7 @@ This plan breaks down the scaffolding work into 40 actionable tasks across 4 pha
 **Branch**: `feature/task-14-security`
 
 **Checklist**:
+
 - [ ] Add startup validation in `agent.py` main:
   - Check Graph credentials if `--source graph` requested
   - Raise error if missing
@@ -444,13 +492,16 @@ This plan breaks down the scaffolding work into 40 actionable tasks across 4 pha
   - Top: must be 1-100
 - [ ] Mask secrets in logs (never print full tokens)
 - [ ] Add rate limiting to `/recommend-graph`:
+
   ```python
   # Simple: 100 requests per minute per IP
   ```
+
 - [ ] Write tests for invalid inputs
 - [ ] Run: `pytest tests/ -v` (all tests should pass)
 
 **Files to Update**:
+
 - Update: [agent.py](agent.py)
 - Update: [tests/](tests/) - add security tests
 
@@ -465,26 +516,34 @@ This plan breaks down the scaffolding work into 40 actionable tasks across 4 pha
 **Branch**: `feature/task-15-lock`
 
 **Checklist**:
+
 - [ ] Generate requirements.txt:
+
   ```bash
   pip freeze > requirements.txt
   ```
+
 - [ ] Or use pip-tools:
+
   ```bash
   pip install pip-tools
   pip-compile pyproject.toml
   ```
+
 - [ ] Create clean venv and test:
+
   ```bash
   python -m venv test_env
   source test_env/bin/activate  # or test_env\Scripts\activate on Windows
   pip install -r requirements.txt
   pytest tests/ -v
   ```
+
 - [ ] Verify all tests pass
 - [ ] Commit files
 
 **Files to Create**:
+
 - Create: [requirements.txt](requirements.txt)
 
 **Dependencies**: Task 1 complete
@@ -495,9 +554,10 @@ This plan breaks down the scaffolding work into 40 actionable tasks across 4 pha
 
 ## PHASE 2: Agents SDK Integration (Week 3-4)
 
-*(Tasks 16-25 follow similar structure)*
+### Tasks 16-25 follow similar structure
 
 ### Summary for Phase 2
+
 - Task 16: Add SDK dependencies
 - Task 17: Agent declaration file
 - Task 18: SDK adapter module
@@ -509,13 +569,10 @@ This plan breaks down the scaffolding work into 40 actionable tasks across 4 pha
 - Task 24: SDK documentation
 - Task 25: End-to-end SDK test
 
----
-
 ## PHASE 3: Enterprise & Deployment (Week 5-6)
 
-*(Tasks 26-35 follow similar structure)*
-
 ### Summary for Phase 3
+
 - Task 26: Application Insights
 - Task 27: Distributed tracing
 - Task 28: Security middleware
@@ -531,9 +588,10 @@ This plan breaks down the scaffolding work into 40 actionable tasks across 4 pha
 
 ## PHASE 4: Polish & Documentation (Week 6)
 
-*(Tasks 36-40 follow similar structure)*
+### Tasks 36-40 follow similar structure
 
 ### Summary for Phase 4
+
 - Task 36: Update README
 - Task 37: Architecture doc
 - Task 38: Operations guide
@@ -544,25 +602,29 @@ This plan breaks down the scaffolding work into 40 actionable tasks across 4 pha
 
 ## Rollup Checklist
 
-### Phase 1 Complete When:
+### Phase 1 Complete When
+
 - [x] All 15 tasks done
 - [x] 95%+ test coverage for auth & Graph modules
 - [x] Local Graph integration works
 - [x] Docs complete
 
-### Phase 2 Complete When:
+### Phase 2 Complete When
+
 - [x] All 10 tasks done
 - [x] Teams Bot Emulator integration works
 - [x] SDK tests pass
 - [x] Copilot hosting ready
 
-### Phase 3 Complete When:
+### Phase 3 Complete When
+
 - [x] All 10 tasks done
 - [x] Bicep deployment works
 - [x] CI/CD pipeline green
 - [x] Monitoring configured
 
-### Phase 4 Complete When:
+### Phase 4 Complete When
+
 - [x] All 5 tasks done
 - [x] README reflects all features
 - [x] Architecture doc complete
@@ -612,6 +674,7 @@ az deployment group create \
 ## Next Steps
 
 **To start**: Pick any tasks from Phase 1 and create a branch. I recommend:
+
 1. **Task 1** (30 min): Update dependencies - validates your environment
 2. **Task 3** (1.5 hrs): Create MSAL auth - core functionality
 3. **Task 5** (2 hrs): Create Graph service - integrates with auth
