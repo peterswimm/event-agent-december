@@ -513,6 +513,79 @@ def main() -> None:
                         result = explain(manifest, session_title, interests)
                         self._send(200, result, start, "explain")
                         return
+                    if path == "/recommend-graph":
+                        if not GRAPH_AVAILABLE:
+                            self._send(
+                                503,
+                                {"error": "Graph API support not available"},
+                                time.time(),
+                                "recommend_graph",
+                            )
+                            return
+                        start = time.time()
+                        interests_raw = qs.get("interests", [""])[0]
+                        user_id = qs.get("userId", [None])[0]
+                        top = qs.get("top", [None])[0]
+                        card_flag = qs.get("card", [None])[0]
+                        interests: List[str] = []
+                        if interests_raw:
+                            interests = _normalize_interests(interests_raw)
+                        if not interests:
+                            self._send(
+                                400,
+                                {"error": "no interests provided"},
+                                start,
+                                "recommend_graph",
+                            )
+                            return
+                        try:
+                            settings = Settings()
+                            if not settings.validate_graph_ready():
+                                errors = settings.get_validation_errors()
+                                self._send(
+                                    502,
+                                    {
+                                        "error": "Graph credentials not configured",
+                                        "details": ", ".join(errors),
+                                    },
+                                    start,
+                                    "recommend_graph",
+                                )
+                                return
+                            auth_client = GraphAuthClient(settings)
+                            graph_service = GraphEventService(auth_client, settings)
+                            top_n = (
+                                int(top)
+                                if top
+                                else manifest["recommend"]["max_sessions_default"]
+                            )
+                            result = recommend_from_graph(
+                                graph_service, interests, top_n
+                            )
+                            if user_id:
+                                result["userId"] = user_id
+                            if default_card or card_flag == "1":
+                                result["adaptiveCard"] = _build_adaptive_card(
+                                    result["sessions"]
+                                )
+                            self._send(200, result, start, "recommend_graph")
+                            return
+                        except (GraphAuthError, GraphServiceError) as e:
+                            self._send(
+                                502,
+                                {"error": f"Graph API error: {str(e)}"},
+                                start,
+                                "recommend_graph",
+                            )
+                            return
+                        except ValueError as e:
+                            self._send(
+                                400,
+                                {"error": str(e)},
+                                start,
+                                "recommend_graph",
+                            )
+                            return
                     if path == "/export":
                         start = time.time()
                         interests_raw = qs.get("interests", [""])[0]
@@ -552,7 +625,7 @@ def main() -> None:
 
             server = HTTPServer(("0.0.0.0", port), Handler)
             print(
-                f"[serve] listening on port {port} (endpoints: /recommend /explain /health /export)"
+                f"[serve] listening on port {port} (endpoints: /recommend /recommend-graph /explain /health /export)"
             )
             try:
                 server.serve_forever()
