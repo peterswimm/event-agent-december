@@ -1,0 +1,3 @@
+[console_scripts]
+eventkit = agent:main
+eventkit-runner = runner:main

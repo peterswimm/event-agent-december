@@ -1,0 +1,89 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/eventkit/agent.schema.json",
+  "title": "Event Kit Manifest",
+  "type": "object",
+  "required": ["sessions", "weights", "recommend"],
+  "properties": {
+    "sessions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "title", "start", "end", "location", "tags", "popularity"],
+        "properties": {
+          "id": {"type": "string"},
+          "title": {"type": "string"},
+          "start": {"type": "string"},
+          "end": {"type": "string"},
+          "location": {"type": "string"},
+          "tags": {"type": "array", "items": {"type": "string"}},
+          "popularity": {"type": "number", "minimum": 0, "maximum": 1}
+        },
+        "additionalProperties": false
+      }
+    },
+    "weights": {
+      "type": "object",
+      "required": ["interest", "popularity", "diversity"],
+      "properties": {
+        "interest": {"type": "number"},
+        "popularity": {"type": "number"},
+        "diversity": {"type": "number"}
+      },
+      "additionalProperties": false
+    },
+    "recommend": {
+      "type": "object",
+      "required": ["max_sessions_default"],
+      "properties": {
+        "max_sessions_default": {"type": "integer", "minimum": 1}
+      },
+      "additionalProperties": false
+    },
+    "explain": {
+      "type": "object",
+      "properties": {
+        "include_contributions": {"type": "boolean"}
+      },
+      "additionalProperties": false
+    },
+    "profile": {
+      "type": "object",
+      "properties": {
+        "storage_file": {"type": "string"}
+      },
+      "additionalProperties": false
+    },
+    "features": {
+      "type": "object",
+      "properties": {
+        "telemetry": {
+          "type": "object",
+          "properties": {
+            "enabled": {"type": "boolean"},
+            "file": {"type": "string"}
+          },
+          "additionalProperties": false
+        },
+        "export": {
+          "type": "object",
+          "properties": {
+            "enabled": {"type": "boolean"},
+            "output_dir": {"type": "string"}
+          },
+          "additionalProperties": false
+        },
+        "externalSessions": {
+          "type": "object",
+          "properties": {
+            "enabled": {"type": "boolean"},
+            "file": {"type": "string"}
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

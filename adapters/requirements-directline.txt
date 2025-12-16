@@ -1,0 +1,4 @@
+aiohttp>=3.9.0
+botbuilder-core>=4.15.0
+botbuilder-schema>=4.15.0
+botbuilder-integration-aiohttp>=4.15.0

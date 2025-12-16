@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Kit Chat</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 500px;
+        }
+
+        .header {
+            background: #667eea;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .chat {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .msg {
+            padding: 10px;
+            border-radius: 4px;
+            max-width: 80%;
+            word-wrap: break-word;
+        }
+
+        .user-msg {
+            background: #667eea;
+            color: white;
+            margin-left: auto;
+        }
+
+        .bot-msg {
+            background: #e0e0e0;
+            color: #333;
+        }
+
+        .input-box {
+            display: flex;
+            gap: 10px;
+            padding: 15px;
+            border-top: 1px solid #ddd;
+        }
+
+        input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        button {
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #764ba2;
+        }
+
+        button:disabled {
+            background: #999;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h2>Event Kit Chat</h2>
+        </div>
+        <div class="chat" id="chat"></div>
+        <div class="input-box">
+            <input type="text" id="interests" placeholder="interests..." />
+            <button id="send">Send</button>
+        </div>
+    </div>
+    <script>
+        const chat = document.getElementById('chat');
+        const input = document.getElementById('interests');
+        const btn = document.getElementById('send');
+        function msg(text, isUser) {
+            const d = document.createElement('div');
+            d.className = isUser ? 'msg user-msg' : 'msg bot-msg';
+            d.textContent = text;
+            chat.appendChild(d);
+            chat.scrollTop = chat.scrollHeight;
+        }
+        async function send() {
+            const text = input.value.trim();
+            if (!text) return;
+            msg(text, true);
+            input.value = '';
+            btn.disabled = true;
+            try {
+                const url = `http://localhost:8010/recommend?interests=${encodeURIComponent(text)}&top=3`;
+                const res = await fetch(url);
+                const data = await res.json();
+                if (data.sessions && Array.isArray(data.sessions)) {
+                    msg(`Found ${data.sessions.length} sessions`, false);
+                    data.sessions.forEach(s => msg(`• ${s.title} (${s.start}-${s.end})`, false));
+                } else {
+                    msg('Error: ' + (data.error || 'No sessions'), false);
+                }
+            } catch (e) {
+                msg('Error: ' + (e.message || 'Connection failed'), false);
+            }
+            btn.disabled = false;
+            input.focus();
+        }
+        btn.onclick = send;
+        input.onkeypress = (e) => { if (e.key === 'Enter') send(); };
+        msg('Hi! Enter interests to find sessions.', false);
+    </script>
+</body>
+
+</html>

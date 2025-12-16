@@ -1,0 +1,252 @@
+📚 PLANNING DOCUMENTS ROADMAP
+═══════════════════════════════════════════════════════════════
+
+START HERE
+    ↓
+   [INDEX.md]
+    "Navigation Hub"
+    ├─ Overview of all documents
+    ├─ Quick links to each doc
+    └─ How to use this plan
+
+CHOOSE YOUR ROLE
+    ↓
+    ├─→ [PLAN_SUMMARY.md]     (20 min) ← START HERE FOR QUICK OVERVIEW
+    │    "High-Level Overview"
+    │    • Architecture diagram
+    │    • 6-week timeline
+    │    • What gets built per phase
+    │    • Prerequisites
+    │    └─→ Then read EXECUTION_PLAN.md for details
+    │
+    ├─→ [SCAFFOLD_ANALYSIS.md] (30 min) ← START HERE FOR DEEP UNDERSTANDING
+    │    "Gap Analysis & Details"
+    │    • What's missing (broken down by component)
+    │    • Why each is needed
+    │    • Dependency requirements
+    │    • Implementation priority
+    │    └─→ Then read EXECUTION_PLAN.md for how-to
+    │
+    ├─→ [EXECUTION_PLAN.md]    (5-10 min/task) ← START HERE TO IMPLEMENT
+    │    "Step-by-Step Task Guide"
+    │    • 40 tasks in 4 phases
+    │    • Detailed checklists per task
+    │    • Git commands
+    │    • Test commands
+    │    ├─→ Reference QUICK_REFERENCE.md while coding
+    │    └─→ Track progress in TASK_TRACKING.md
+    │
+    ├─→ [TASK_TRACKING.md]     (2 min/check-in) ← USE FOR DAILY TRACKING
+    │    "Progress Tracker"
+    │    • Status for all 40 tasks
+    │    • Time estimates
+    │    • Files per task
+    │    └─→ Update status as you complete tasks
+    │
+    └─→ [QUICK_REFERENCE.md]   (as needed) ← KEEP OPEN WHILE CODING
+         "Commands & Troubleshooting"
+         • Essential commands
+         • File quick reference
+         • Debugging tips
+         • Common errors & fixes
+         └─→ First stop when stuck
+
+═══════════════════════════════════════════════════════════════
+
+READING PATHS BY ROLE
+
+👔 EXECUTIVE / PROJECT MANAGER
+   1. Read: PLAN_SUMMARY.md (20 min)
+      ✓ Timeline: 6 weeks
+      ✓ 40 tasks across 4 phases
+      ✓ Team effort: ~50 hours
+      ✓ Phase deliverables
+   2. Bookmark: TASK_TRACKING.md (for weekly check-ins)
+
+🏗️ ARCHITECT / LEAD
+   1. Read: SCAFFOLD_ANALYSIS.md (30 min)
+      ✓ Complete gap analysis
+      ✓ Component breakdown
+      ✓ Architecture overview
+   2. Read: PLAN_SUMMARY.md (20 min)
+      ✓ Timeline & phases
+      ✓ Infrastructure overview
+   3. Review: EXECUTION_PLAN.md → Phase 3 (infrastructure tasks)
+   4. Bookmark: QUICK_REFERENCE.md (commands reference)
+
+💻 DEVELOPER (STARTING)
+   1. Read: PLAN_SUMMARY.md (20 min) ← GET CONTEXT
+      ✓ Understand what you're building
+      ✓ See the phases & timeline
+   2. Read: SCAFFOLD_ANALYSIS.md (30 min) ← UNDERSTAND WHY
+      ✓ Know what's missing
+      ✓ Understand dependencies
+   3. Open: EXECUTION_PLAN.md ← START TASK 1
+      ✓ Follow detailed checklist
+      ✓ Run provided commands
+   4. Bookmark: QUICK_REFERENCE.md ← KEEP HANDY
+      ✓ Copy-paste commands
+      ✓ Troubleshoot issues
+   5. Track: TASK_TRACKING.md ← UPDATE DAILY
+      ✓ Mark tasks complete
+      ✓ Move to next task
+
+💪 DEVELOPER (EXPERIENCED)
+   1. Skim: PLAN_SUMMARY.md (10 min)
+   2. Read: EXECUTION_PLAN.md → Task 1
+      ✓ Just start implementing
+   3. Reference: QUICK_REFERENCE.md (as needed)
+   4. Track: TASK_TRACKING.md (daily updates)
+
+═══════════════════════════════════════════════════════════════
+
+DOCUMENT RELATIONSHIPS
+
+               INDEX.md
+                (hub)
+                 ↓
+        ┌────────┼────────┐
+        ↓        ↓        ↓
+      Quick    Deep     Implement
+      Start    Dive      Now
+        ↓        ↓        ↓
+    PLAN_     SCAFFOLD_  EXECUTION_
+    SUMMARY   ANALYSIS   PLAN
+        ↓        ↓        ↓
+        └────────┼────────┘
+                 ↓
+        ┌────────┴────────┐
+        ↓                 ↓
+    TASK_            QUICK_
+    TRACKING         REFERENCE
+    (daily)          (lookup)
+
+═══════════════════════════════════════════════════════════════
+
+TYPICAL WORKFLOW
+
+START OF DAY
+  1. Open TASK_TRACKING.md
+     → Find next "Ready" task
+  2. Open EXECUTION_PLAN.md → Find that task
+     → Read checklist items
+  3. Open QUICK_REFERENCE.md
+     → Have available for commands
+
+DURING WORK
+  1. Follow EXECUTION_PLAN.md checklist
+  2. Stuck? → QUICK_REFERENCE.md → Troubleshooting
+  3. Need command? → QUICK_REFERENCE.md → Commands section
+
+END OF DAY
+  1. Complete task checklist
+  2. Run tests (from QUICK_REFERENCE.md)
+  3. Commit with provided message format
+  4. Update TASK_TRACKING.md → mark complete
+  5. Git push & create PR
+
+NEXT DAY
+  → Repeat with next task
+
+═══════════════════════════════════════════════════════════════
+
+CONTENT BREAKDOWN
+
+Document               Type        Length    Best For      Time
+────────────────────────────────────────────────────────────────
+_DELIVERY_SUMMARY     Status       ~300      Quick check   2 min
+INDEX                 Navigation   ~300      Orientation   10 min
+PLAN_SUMMARY          Overview     ~200      Context       20 min
+SCAFFOLD_ANALYSIS     Details      ~400      Understanding 30 min
+EXECUTION_PLAN        How-to       ~600      Implementation 5-10 min/task
+TASK_TRACKING         Tracker      ~300      Progress       2 min/check
+QUICK_REFERENCE       Reference    ~400      While coding  As needed
+
+                                Total: ~2,200 lines of planning
+
+═══════════════════════════════════════════════════════════════
+
+QUICK FACTS
+
+📊 Plan Scope
+   • 40 tasks across 4 phases
+   • 6 weeks total duration
+   • ~50 hours of development work
+   • ~100% test coverage target
+
+🎯 What Gets Built
+   Phase 1 (2w): MSAL auth + Graph API integration
+   Phase 2 (1.5w): Agents SDK + Teams hosting
+   Phase 3 (1.5w): Enterprise features + deployment
+   Phase 4 (1w): Documentation + release
+
+📁 New Files
+   • Core: graph_auth.py, graph_service.py
+   • SDK: agents_sdk_adapter.py, team_activity_handler.py
+   • Infra: infra/main.bicep, .devcontainer/, .github/workflows/
+   • Tests: tests/test_*.py
+   • Docs: docs/graph-setup.md, docs/agents-sdk-setup.md, etc.
+
+✅ Success Metrics
+   • >85% test coverage per phase
+   • All tasks completed & merged
+   • Zero security warnings
+   • Deployable to Azure
+   • Production documentation complete
+
+═══════════════════════════════════════════════════════════════
+
+GETTING STARTED RIGHT NOW
+
+Step 1 (5 min):
+   → Open INDEX.md
+   → Read "How to Use This Plan"
+
+Step 2 (20 min):
+   → Open PLAN_SUMMARY.md
+   → Read full document
+
+Step 3 (Now):
+   → Open EXECUTION_PLAN.md
+   → Find "Task 1: Update Dependencies"
+   → Follow the checklist
+
+Step 4 (Bookmark):
+   → QUICK_REFERENCE.md (for commands)
+   → TASK_TRACKING.md (for progress)
+
+═══════════════════════════════════════════════════════════════
+
+QUESTIONS?
+
+"What's missing?"         → SCAFFOLD_ANALYSIS.md
+"How long will it take?"  → PLAN_SUMMARY.md (timeline section)
+"How do I do task X?"     → EXECUTION_PLAN.md (find task X)
+"What command do I run?"  → QUICK_REFERENCE.md (commands section)
+"Where are we at?"        → TASK_TRACKING.md (progress section)
+"Which doc should I read?" → INDEX.md (document guide table)
+
+═══════════════════════════════════════════════════════════════
+
+DOCUMENT FILENAMES FOR QUICK REFERENCE
+
+INDEX.md                    Navigation hub
+PLAN_SUMMARY.md             20-min overview  
+SCAFFOLD_ANALYSIS.md        Gap analysis
+EXECUTION_PLAN.md           Task-by-task guide
+TASK_TRACKING.md            Progress tracker
+QUICK_REFERENCE.md          Commands & help
+_DELIVERY_SUMMARY.txt       This summary
+
+═══════════════════════════════════════════════════════════════
+
+READY? 
+
+→ Start with INDEX.md
+
+Questions? Check that document's table of contents.
+
+═══════════════════════════════════════════════════════════════
+
+Created: 2025-12-16
+Status: Ready to implement ✅

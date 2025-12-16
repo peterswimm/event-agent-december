@@ -1,0 +1,38 @@
+id: eventkit
+name: Event Kit Innovation Pack
+version: 0.1.0
+description: >-
+  Renamed from simplified-event-agent. Minimal session recommendation & explanation agent
+  with telemetry, itinerary export, and external data override.
+license: MIT
+repository: https://github.com/peterswimm/vibe-kit
+entrypoint: agent.py
+features:
+  telemetry:
+    file: telemetry.jsonl
+  export:
+    output_dir: exports
+  externalSessions:
+    file: sessions_external.json
+docs:
+  overview: EVENT_KIT.md
+  guides:
+    - docs/technical-guide.md
+    - docs/performance-guide.md
+    - docs/troubleshooting.md
+    - docs/application-patterns.md
+    - docs/data-integration.md
+    - docs/evaluation.md
+    - docs/governance.md
+assets:
+  sessions_template: assets/sessions_external.json
+  sample_itinerary: assets/sample_itinerary.md
+scripts:
+  generate_sessions_template: scripts/generate_sessions_template.py
+  export_itinerary: scripts/export_itinerary.py
+  summarize_telemetry: scripts/summarize_telemetry.py
+tags:
+  - agents
+  - events
+  - recommendation
+  - telemetry

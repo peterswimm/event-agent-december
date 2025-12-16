@@ -1,0 +1,102 @@
+openapi: 3.0.3
+info:
+  title: Event Kit Agent API
+  version: 0.1.0
+paths:
+  /health:
+    get:
+      summary: Health check
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+  /recommend:
+    get:
+      summary: Recommend sessions
+      parameters:
+        - in: query
+          name: interests
+          schema:
+            type: string
+          description: Comma separated interests (ignored if profileLoad present)
+        - in: query
+          name: profileLoad
+          schema:
+            type: string
+          description: Profile id to load interests from storage
+        - in: query
+          name: top
+          schema:
+            type: integer
+          description: Limit number of sessions returned
+        - in: query
+          name: card
+          schema:
+            type: string
+          description: "Set to 1 to include Adaptive Card"
+      responses:
+        "200":
+          description: Recommendation result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  sessions:
+                    type: array
+                    items:
+                      type: object
+                  scoring:
+                    type: array
+                    items:
+                      type: object
+                  conflicts:
+                    type: integer
+        "400":
+          description: Missing interests
+  /explain:
+    get:
+      summary: Explain a single session
+      parameters:
+        - in: query
+          name: session
+          required: true
+          schema:
+            type: string
+          description: Session title to explain
+        - in: query
+          name: interests
+          schema:
+            type: string
+        - in: query
+          name: profileLoad
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Explanation payload
+        "400":
+          description: Missing session title
+  /export:
+    get:
+      summary: Export itinerary markdown
+      parameters:
+        - in: query
+          name: interests
+          schema:
+            type: string
+        - in: query
+          name: profileLoad
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Export result (markdown plus optional saved path)
+        "400":
+          description: Missing interests

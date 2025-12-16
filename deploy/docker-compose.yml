@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  agent:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+    ports:
+      - "8010:8010"
+    environment:
+      - PORT=8011
+    networks:
+      - eventkit
+    restart: unless-stopped
+
+  # Optional: frontend dev server (only if actively developing UI)
+  # Uncomment and run `docker compose up -d` to enable
+  # frontend:
+  #   image: node:18-slim
+  #   working_dir: /app
+  #   volumes:
+  #     - ../../frontend:/app
+  #   command: bash -c "npm install && npm run dev -- --host 0.0.0.0 --port 5174"
+  #   expose:
+  #     - 5174
+  #   networks:
+  #     - eventkit
+
+networks:
+  eventkit:
+    driver: bridge

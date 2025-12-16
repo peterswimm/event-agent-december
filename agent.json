@@ -1,0 +1,18 @@
+{
+  "sessions": [
+    {"id": "s1", "title": "AI Safety Foundations", "start": "13:00", "end": "13:40", "location": "Hall A", "tags": ["ai safety", "governance"], "popularity": 0.8},
+    {"id": "s2", "title": "Generative Agents in Production", "start": "13:50", "end": "14:30", "location": "Hall C", "tags": ["agents", "gen ai"], "popularity": 0.9},
+    {"id": "s3", "title": "Edge Intelligence Demos", "start": "14:40", "end": "15:20", "location": "Hall B", "tags": ["edge", "agents"], "popularity": 0.6},
+    {"id": "s4", "title": "Responsible LLM Patterns", "start": "15:30", "end": "16:10", "location": "Hall A", "tags": ["responsible ai", "ai safety"], "popularity": 0.75},
+    {"id": "s5", "title": "Telemetry for Agent Ecosystems", "start": "15:30", "end": "16:10", "location": "Hall D", "tags": ["agents", "observability"], "popularity": 0.65}
+  ],
+  "weights": {"interest": 2.0, "popularity": 0.5, "diversity": 0.3},
+  "recommend": {"max_sessions_default": 3},
+  "explain": {"include_contributions": true},
+  "profile": {"storage_file": "~/.event_agent_profiles.json"},
+  "features": {
+    "telemetry": {"enabled": true, "file": "telemetry.jsonl"},
+    "export": {"enabled": true, "output_dir": "exports"},
+    "externalSessions": {"enabled": true, "file": "sessions_external.json"}
+  }
+}

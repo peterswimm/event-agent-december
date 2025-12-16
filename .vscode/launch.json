@@ -1,0 +1,43 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "EventKit: custom-chat",
+      "type": "python",
+      "request": "launch",
+      "program": "${workspaceFolder}/eventkit/agent.py",
+      "args": ["serve", "--port", "8010", "--card"],
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}/eventkit"
+    },
+    {
+      "name": "EventKit: runner (env RUN_MODE)",
+      "type": "python",
+      "request": "launch",
+      "program": "${workspaceFolder}/eventkit/runner.py",
+      "envFile": "${workspaceFolder}/eventkit/.env",
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}/eventkit"
+    },
+    {
+      "name": "EventKit: runner (m365-agent)",
+      "type": "python",
+      "request": "launch",
+      "program": "${workspaceFolder}/eventkit/runner.py",
+      "args": ["--mode", "m365-agent", "--port", "3978"],
+      "envFile": "${workspaceFolder}/eventkit/.env",
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}/eventkit"
+    },
+    {
+      "name": "EventKit: runner (sharepoint-agent)",
+      "type": "python",
+      "request": "launch",
+      "program": "${workspaceFolder}/eventkit/runner.py",
+      "args": ["--mode", "sharepoint-agent"],
+      "envFile": "${workspaceFolder}/eventkit/.env",
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}/eventkit"
+    }
+  ]
+}

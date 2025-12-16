@@ -1,0 +1,11 @@
+[
+  {
+    "id": "ext1",
+    "title": "External Session: Agents and Governance",
+    "start": "11:00",
+    "end": "11:40",
+    "location": "Room D",
+    "tags": ["agents", "governance"],
+    "popularity": 0.82
+  }
+]
