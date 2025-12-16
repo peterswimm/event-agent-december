@@ -1,21 +1,35 @@
 #!/usr/bin/env python3
 """Event Kit Agent (renamed from simplified-event-agent)
 Usage:
+  # Manifest-based recommendations
   python agent.py recommend --interests "ai safety, agents" --top 3 --profile-save user1
   python agent.py explain --session "Generative Agents in Production" --interests "agents, gen ai"
+  
+  # Graph API recommendations (requires Graph credentials in .env)
+  python agent.py recommend --source graph --user-id user@example.com --interests "ai safety" --top 3
+  python agent.py recommend --source graph --interests "agents" --top 3  # Uses default user
 """
 
 from __future__ import annotations
 import json, argparse, pathlib, urllib.parse, time
 import os
 from http.server import BaseHTTPRequestHandler, HTTPServer
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 
 MANIFEST_PATH = pathlib.Path(__file__).parent / "agent.json"
 try:
     from telemetry import get_telemetry  # local module
 except Exception:  # pragma: no cover
     get_telemetry = lambda manifest: None  # type: ignore
+
+try:
+    from settings import Settings  # Graph settings
+    from graph_auth import GraphAuthClient, GraphAuthError
+    from graph_service import GraphEventService, GraphServiceError
+    from core import recommend_from_graph
+    GRAPH_AVAILABLE = True
+except Exception:  # pragma: no cover
+    GRAPH_AVAILABLE = False  # Graph dependencies not available
 
 
 def load_manifest(path: pathlib.Path = MANIFEST_PATH) -> Dict[str, Any]:
@@ -148,6 +162,28 @@ def _count_conflicts(sessions: List[Dict[str, Any]]) -> int:
     return sum(1 for v in slots.values() if v > 1)
 
 
+def _build_itinerary_markdown(interests: List[str], recommendation: Dict[str, Any]) -> str:
+    """Build markdown itinerary from recommendation result."""
+    lines = ["# Event Itinerary"]
+    lines.append(f"\n**Recommended for:** {', '.join(interests)}\n")
+    
+    for session in recommendation.get("sessions", []):
+        title = session.get("title", "Unknown Session")
+        start = session.get("start", "?")
+        end = session.get("end", "?")
+        location = session.get("location", "?")
+        tags = session.get("tags", [])
+        
+        lines.append(f"## {title}")
+        lines.append(f"\nTime: {start} - {end} | Location: {location}")
+        if tags:
+            lines.append(f"Tags: {', '.join(tags)}\n")
+        else:
+            lines.append("")
+    
+    return "\n".join(lines)
+
+
 def _build_adaptive_card(sessions: List[Dict[str, Any]]) -> Dict[str, Any]:
     body = []
     actions = []
@@ -200,23 +236,58 @@ def _build_adaptive_card(sessions: List[Dict[str, Any]]) -> Dict[str, Any]:
     }
 
 
-def _build_itinerary_markdown(interests: List[str], rec: Dict[str, Any]) -> str:
-    lines = ["# Event Itinerary", "", f"Interests: {', '.join(interests)}", ""]
-    for s in rec["sessions"]:
-        lines.append(f"## {s['title']}")
-        lines.append(
-            f"Time: {s.get('start', '?')} - {s.get('end', '?')} | Location: {s.get('location', '?')}"
-        )
-        tags = ", ".join(s.get("tags", []))
-        lines.append(f"Tags: {tags}")
-        lines.append("")
-    return "\n".join(lines)
+def _get_graph_recommendation(
+    interests: List[str], top_n: int, user_id: Optional[str] = None
+) -> Dict[str, Any]:
+    """Get recommendations from Microsoft Graph API.
+    
+    Args:
+        interests: List of interest strings
+        top_n: Number of recommendations to return
+        user_id: Optional user ID (for future use with delegated auth)
+        
+    Returns:
+        Recommendation dict with sessions, scoring, and conflicts
+        
+    Raises:
+        ValueError: If Graph is not available or credentials are missing
+        GraphAuthError: If authentication fails
+        GraphServiceError: If Graph API fails
+    """
+    if not GRAPH_AVAILABLE:
+        raise ValueError("Graph API support not available. Install required packages.")
+    
+    try:
+        settings = Settings()
+        if not settings.validate_graph_ready():
+            errors = settings.get_validation_errors()
+            raise ValueError(f"Graph credentials not configured: {', '.join(errors)}")
+        
+        # Initialize auth and service
+        auth_client = GraphAuthClient(settings)
+        graph_service = GraphEventService(auth_client, settings)
+        
+        # Get recommendations from Graph
+        result = recommend_from_graph(graph_service, interests, top_n)
+        
+        # Add user_id if provided (for tracking/logging)
+        if user_id:
+            result["user_id"] = user_id
+        
+        return result
+        
+    except (GraphAuthError, GraphServiceError) as e:
+        raise ValueError(f"Graph API error: {str(e)}") from e
 
 
 def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser("eventkit agent")
     sub = p.add_subparsers(dest="command")
     r = sub.add_parser("recommend")
+    r.add_argument("--source", type=str, default="manifest", choices=["manifest", "graph"], 
+                   help="Event source: 'manifest' (default) or 'graph' (Microsoft Graph API)")
+    r.add_argument("--user-id", type=str, default=None, 
+                   help="User ID for Graph API (optional, uses service account if not provided)")
     r.add_argument("--interests", type=str, default="")
     r.add_argument("--top", type=int, default=None)
     r.add_argument("--profile-save", type=str, default=None)
@@ -260,6 +331,27 @@ def main() -> None:
                 )
             return
         top_n = args.top if args.top else manifest["recommend"]["max_sessions_default"]
+        
+        # Handle Graph mode
+        source = getattr(args, "source", "manifest")
+        if source == "graph":
+            try:
+                user_id = getattr(args, "user_id", None)
+                result = _get_graph_recommendation(interests, top_n, user_id)
+                if args.profile_save and storage_file:
+                    save_profile(storage_file, args.profile_save, interests)
+                    result["profileSaved"] = args.profile_save
+                print(json.dumps(result, indent=2))
+                if telemetry:
+                    telemetry.log("recommend_graph", result, start_ts, success=True)
+            except ValueError as e:
+                err = {"error": str(e), "source": "graph"}
+                print(json.dumps(err))
+                if telemetry:
+                    telemetry.log("recommend_graph", err, start_ts, success=False, error=str(e))
+            return
+        
+        # Default manifest mode
         result = recommend(manifest, interests, top_n)
         if args.profile_save and storage_file:
             save_profile(storage_file, args.profile_save, interests)
