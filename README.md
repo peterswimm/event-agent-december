@@ -1,20 +1,37 @@
-# Event Kit
+# Event Kit Agent
 
-**Minimal declarative event recommendation agent** for Vibe Kit. Demonstrates core agent patterns with one manifest (`agent.json`) and one script (`agent.py`).
+**AI-powered event recommendation agent** with multi-channel deployment support. Demonstrates production-ready agent patterns for Teams, Copilot, HTTP APIs, and CLI.
+
+[![Status: Production Ready](https://img.shields.io/badge/Status-Production%20Ready-success)](https://github.com/peterswimm/event-agent-december)
+[![Tests: 147 Passing](https://img.shields.io/badge/Tests-147%20Passing-success)](./tests)
+[![Documentation: Complete](https://img.shields.io/badge/Docs-Complete-blue)](./docs)
 
 ---
 
-## Overview
+## 🌟 Overview
 
-Event Kit is a lightweight innovation kit showcasing:
+Event Kit is a comprehensive AI agent showcasing enterprise-ready patterns:
 
-- **Declarative manifest**: Sessions, weights, and feature flags in JSON
-- **CLI + HTTP server**: Recommend, explain, export endpoints
-- **Adaptive Cards**: Interactive UI for Copilot experiences
-- **Telemetry**: Structured JSONL logging for observability
-- **Profile persistence**: Save/load user preferences
-- **External data override**: Swap in real event feeds
-- **Microsoft Graph integration**: Live calendar events with MSAL auth (NEW)
+### Core Features
+- ✅ **Declarative manifest**: Sessions, weights, and feature flags in JSON
+- ✅ **Multi-channel deployment**: CLI, HTTP API, Teams, Copilot Studio
+- ✅ **Bot Framework integration**: Full Teams/Outlook bot with adaptive cards
+- ✅ **Microsoft Graph integration**: Live calendar events with MSAL auth
+- ✅ **Adaptive Cards**: Interactive UI for rich experiences
+- ✅ **Profile persistence**: Save/load user preferences
+- ✅ **Structured telemetry**: Application Insights + JSONL logging
+- ✅ **Security hardening**: Input validation, rate limiting, CORS
+- ✅ **Production infrastructure**: Docker, Bicep, CI/CD pipelines
+
+### Deployment Modes
+
+| Mode | Use Case | Entry Point | Documentation |
+|------|----------|-------------|---------------|
+| **CLI** | Local testing, scripts | `agent.py` | [Quick Start](#quick-start) |
+| **HTTP API** | REST endpoints | `agent.py serve` | [API Docs](docs/api-guide.md) |
+| **Teams Bot** | Microsoft Teams | `bot_server.py` | [Teams Setup](docs/agents-sdk-setup.md) |
+| **Copilot Plugin** | Copilot Studio | `copilot-plugin.json` | [Copilot Guide](docs/agents-sdk-setup.md#copilot-integration) |
+| **Docker** | Containerized deployment | `deploy/Dockerfile` | [Deployment Guide](docs/deployment-guide.md) |
 
 ---
 
@@ -36,24 +53,361 @@ For production-ready Graph/SharePoint integration, see [`innovation-kit-reposito
 
 ---
 
-## 📚 Documentation
+## � Quick Start
 
-**Complete documentation is now available in organized, audience-focused guides:**
+Choose your testing environment:
 
-👉 **[Start Here: docs/00-START-HERE.md](docs/00-START-HERE.md)** — Pick your path (User, Developer, DevOps)
+### 1️⃣ CLI Mode (30 seconds)
 
-Quick links:
+```bash
+# Install dependencies
+pip install -r requirements.txt
 
-- 🚀 [5-Minute Quick Start](docs/01-GETTING-STARTED/quick-start.md)
-- 📖 [Installation Guide](docs/01-GETTING-STARTED/installation.md)
-- � [API Documentation](docs/api-guide.md) - Full reference with 100+ examples
-- �📋 [Command Reference](docs/REFERENCE.md)
-- 📅 [Graph API Setup](docs/03-GRAPH-API/setup.md)
-- 🆘 [Troubleshooting](docs/03-GRAPH-API/troubleshooting.md)
+# Recommend sessions
+python agent.py recommend --interests "agents, ai safety" --top 3
+
+# Explain a session
+python agent.py explain --session "Generative Agents in Production" --interests "agents, gen ai"
+
+# Export itinerary
+python agent.py export --interests "agents, privacy" --output my_itinerary.md
+```
+
+### 2️⃣ HTTP API Mode (1 minute)
+
+```bash
+# Start server
+python agent.py serve --port 8010 --card
+
+# Test endpoints
+curl http://localhost:8010/health
+curl "http://localhost:8010/recommend?interests=agents,ai+safety&top=3"
+curl "http://localhost:8010/explain?session=Generative+Agents&interests=agents"
+```
+
+### 3️⃣ Teams Bot Mode (5 minutes)
+
+```bash
+# Start bot server
+python bot_server.py
+
+# Download Bot Framework Emulator v4.14.1+
+# https://github.com/microsoft/BotFramework-Emulator/releases/latest
+
+# Connect to: http://localhost:3978/api/messages
+# Send: @bot recommend agents, machine learning
+```
+
+**Complete guide**: [LOCAL_TESTING.md](LOCAL_TESTING.md)
+
+### 4️⃣ Docker Mode (2 minutes)
+
+```bash
+# Build and run
+docker build -t eventkit:latest -f deploy/Dockerfile .
+docker run -p 8010:8010 eventkit:latest
+
+# Or use Docker Compose
+cd deploy
+docker compose up
+```
 
 ---
 
-## API Overview
+## 📚 Documentation Hub
+
+### Getting Started
+- 🚀 **[Quick Start](docs/01-GETTING-STARTED/quick-start.md)** - 5-minute setup
+- 📦 **[Installation Guide](docs/01-GETTING-STARTED/installation.md)** - Detailed setup
+- 🧪 **[Local Testing Guide](LOCAL_TESTING.md)** - Test all channels locally
+- 📖 **[Teams Quick Reference](TEAMS_QUICK_REFERENCE.md)** - Bot commands & usage
+
+### Integration Guides
+- 🤖 **[Teams/Copilot Setup](docs/agents-sdk-setup.md)** - Bot Framework integration (650+ lines)
+- 📅 **[Graph API Setup](docs/03-GRAPH-API/setup.md)** - Calendar integration
+- 🚀 **[Deployment Guide](docs/deployment-guide.md)** - Production deployment (500+ lines)
+- 🔧 **[API Documentation](docs/api-guide.md)** - HTTP endpoints with 100+ examples
+
+### Development
+- 💻 **[Development Guide](DEVELOPMENT.md)** - Local development setup
+- 🏗️ **[Architecture Guide](docs/04-ARCHITECTURE/design.md)** - System design
+- 🐛 **[Troubleshooting](docs/troubleshooting.md)** - Common issues & solutions
+- ✅ **[Testing Guide](docs/06-DEVELOPMENT/testing.md)** - Test strategy
+
+### Project Status
+- 📊 **[Phase 3 Completion](PHASE3_COMPLETION.md)** - What was built (400+ lines)
+- 🗺️ **[Roadmap](ROADMAP.md)** - Implementation progress
+- 📋 **[Work Summary](WORK_COMPLETED.md)** - Executive summary
+
+---
+
+## 🧪 Multi-Channel Testing Environments
+
+### Environment 1: Local CLI
+**Purpose**: Quick testing, scripting, debugging
+
+```bash
+# Test recommendation logic
+python agent.py recommend --interests "agents" --top 3
+
+# Test with profile persistence
+python agent.py recommend --interests "agents, telemetry" --profile-save demo
+python agent.py recommend --profile-load demo --top 5
+```
+
+**Best for**: Algorithm testing, data validation, automation
+
+---
+
+### Environment 2: HTTP API Server
+**Purpose**: REST API testing, integration testing
+
+```bash
+# Start server with adaptive cards
+python agent.py serve --port 8010 --card
+```
+
+**Test with curl**:
+```bash
+# Health check
+curl http://localhost:8010/health
+
+# Recommendations
+curl "http://localhost:8010/recommend?interests=agents,ai+safety&top=5"
+
+# With adaptive cards
+curl "http://localhost:8010/recommend?interests=agents&top=3&card=1"
+
+# Explain session
+curl "http://localhost:8010/explain?session=AI+Safety+Foundations&interests=ai+safety"
+
+# Export itinerary
+curl "http://localhost:8010/export?interests=agents,privacy&format=markdown"
+```
+
+**Best for**: API integration, performance testing, HTTP client development
+
+---
+
+### Environment 3: Bot Framework Emulator
+**Purpose**: Teams bot testing, conversation flow testing
+
+**Setup**:
+1. Start bot server: `python bot_server.py`
+2. Download [Bot Framework Emulator v4.14.1+](https://github.com/microsoft/BotFramework-Emulator/releases/latest)
+3. Open emulator, connect to `http://localhost:3978/api/messages`
+4. Leave App ID and Password empty for local testing
+
+**Test commands**:
+```
+recommend agents, machine learning --top 5
+explain "Generative Agents in Production" --interests agents
+export agents, ai safety --profile my_profile
+help
+```
+
+**Features to test**:
+- ✅ Command parsing
+- ✅ Adaptive cards rendering
+- ✅ Natural language queries
+- ✅ Error handling
+- ✅ Typing indicators
+- ✅ Profile persistence
+
+**Best for**: Bot UX testing, conversation design, Teams preparation
+
+**Complete guide**: [LOCAL_TESTING.md](LOCAL_TESTING.md)
+
+---
+
+### Environment 4: Microsoft Teams (Local Tunnel)
+**Purpose**: Real Teams environment testing
+
+**Setup with ngrok**:
+```bash
+# Start bot server
+python bot_server.py
+
+# In another terminal, start ngrok
+ngrok http 3978
+
+# Copy ngrok URL (e.g., https://abc-123-def.ngrok.io)
+# Update bot endpoint in Azure Portal or Bot Framework registration
+# Upload teams-app.json to Teams Developer Portal
+```
+
+**Test in Teams**:
+```
+@EventKit Agent recommend agents, machine learning
+@EventKit Agent explain "Session Title" --interests agents
+@EventKit Agent export agents --profile tech_days
+@EventKit Agent help
+```
+
+**Best for**: End-to-end Teams testing, user acceptance testing
+
+---
+
+### Environment 5: Docker Container
+**Purpose**: Production-like environment, deployment validation
+
+```bash
+# Build image
+docker build -t eventkit:test -f deploy/Dockerfile .
+
+# Run with environment variables
+docker run -p 8010:8010 \
+  -e BOT_ID="your-bot-id" \
+  -e BOT_PASSWORD="your-password" \
+  eventkit:test
+
+# Or use Docker Compose
+cd deploy
+docker compose up
+```
+
+**Test**:
+```bash
+curl http://localhost:8010/health
+curl "http://localhost:8010/recommend?interests=agents&top=3"
+```
+
+**Best for**: Deployment validation, container testing, CI/CD pipeline testing
+
+---
+
+### Environment 6: Copilot Studio
+**Purpose**: Copilot integration testing
+
+**Setup**:
+1. Go to [Copilot Studio](https://copilotstudio.microsoft.com)
+2. Create new copilot
+3. Import `copilot-plugin.json`
+4. Configure actions with bot endpoint
+
+**Test scenarios**:
+- "Find sessions about agents and AI"
+- "Explain why this session matches my interests"
+- "Export my personalized agenda"
+
+**Best for**: Copilot UX testing, AI orchestration validation
+
+---
+
+### Environment 7: Azure Production
+**Purpose**: Production deployment, monitoring
+
+**Deploy**:
+```bash
+# Using Bicep templates
+az deployment group create \
+  --resource-group eventkit-prod-rg \
+  --template-file infra/main.bicep \
+  --parameters infra/prod.bicepparam
+```
+
+**Monitor**:
+- Application Insights for telemetry
+- Log Analytics for centralized logs
+- Azure Monitor for alerts
+
+**Best for**: Production validation, load testing, performance monitoring
+
+**Complete guide**: [docs/deployment-guide.md](docs/deployment-guide.md)
+
+---
+
+## 🎯 API Overview
+
+### HTTP Endpoints
+
+| Endpoint | Method | Purpose | Example |
+|----------|--------|---------|---------|
+| `/health` | GET | Health check | `curl http://localhost:8010/health` |
+| `/recommend` | GET | Get personalized recommendations | `curl "http://localhost:8010/recommend?interests=agents&top=3"` |
+| `/explain` | GET | Understand why a session matches | `curl "http://localhost:8010/explain?session=Title&interests=agents"` |
+| `/export` | GET | Export itinerary to Markdown | `curl "http://localhost:8010/export?interests=agents&format=markdown"` |
+| `/recommend-graph` | GET | Calendar-based recommendations | `curl "http://localhost:8010/recommend-graph?interests=agents&top=5"` |
+
+**Full documentation**: [docs/api-guide.md](docs/api-guide.md) (100+ examples)
+
+### Bot Commands (Teams/Emulator)
+
+| Command | Format | Example |
+|---------|--------|---------|
+| Recommend | `@bot recommend <interests> --top <n>` | `@bot recommend agents, ai safety --top 5` |
+| Explain | `@bot explain "<title>" --interests <list>` | `@bot explain "Session Title" --interests agents` |
+| Export | `@bot export <interests> --profile <name>` | `@bot export agents --profile my_profile` |
+| Help | `@bot help` | `@bot help` |
+
+**Full reference**: [TEAMS_QUICK_REFERENCE.md](TEAMS_QUICK_REFERENCE.md)
+
+---
+
+## 🏗️ Architecture & Components
+
+### System Architecture
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                     User Interfaces                          │
+│  Teams | Outlook | Copilot Studio | HTTP API | CLI          │
+└─────────────────┬───────────────────────────────────────────┘
+                  │
+┌─────────────────▼───────────────────────────────────────────┐
+│                  Integration Layer                           │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐      │
+│  │ Bot Handler  │  │ SDK Adapter  │  │ HTTP Server  │      │
+│  │ (Teams)      │  │ (Copilot)    │  │ (REST API)   │      │
+│  └──────────────┘  └──────────────┘  └──────────────┘      │
+└─────────────────┬───────────────────────────────────────────┘
+                  │
+┌─────────────────▼───────────────────────────────────────────┐
+│                    Core Engine                               │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐      │
+│  │ recommend()  │  │ explain()    │  │ export()     │      │
+│  │ scoring      │  │ matching     │  │ itinerary    │      │
+│  └──────────────┘  └──────────────┘  └──────────────┘      │
+│                                                               │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐      │
+│  │ Graph API    │  │ Telemetry    │  │ Profiles     │      │
+│  │ Integration  │  │ Logging      │  │ Storage      │      │
+│  └──────────────┘  └──────────────┘  └──────────────┘      │
+└───────────────────────────────────────────────────────────────┘
+```
+
+### Key Components
+
+| Component | File | Purpose | Lines |
+|-----------|------|---------|-------|
+| **Core Logic** | `core.py` | Recommendation engine | ~400 |
+| **Agent CLI** | `agent.py` | Command-line interface | ~800 |
+| **Bot Handler** | `bot_handler.py` | Teams message processing | 539 |
+| **Bot Server** | `bot_server.py` | aiohttp HTTP server | 223 |
+| **SDK Adapter** | `agents_sdk_adapter.py` | Agents SDK integration | 539 |
+| **Graph Service** | `graph_service.py` | Microsoft Graph API | ~300 |
+| **Telemetry** | `telemetry.py` | Application Insights | ~200 |
+| **Settings** | `settings.py` | Configuration management | ~150 |
+
+### Feature Matrix
+
+| Feature | CLI | HTTP API | Bot Emulator | Teams | Copilot | Production |
+|---------|-----|----------|--------------|-------|---------|------------|
+| **Recommendations** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **Explanations** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **Export Itinerary** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **Adaptive Cards** | ❌ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **Graph Integration** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **Profile Persistence** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **Natural Language** | ❌ | ❌ | ✅ | ✅ | ✅ | ✅ |
+| **Rate Limiting** | ❌ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **Telemetry** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **Authentication** | ❌ | ❌ | ❌ | ✅ | ✅ | ✅ |
+| **Monitoring** | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
+
+---
+
+## Quick Start
 
 | Endpoint | Method | Purpose |
 |----------|--------|---------|
@@ -293,57 +647,89 @@ To integrate with Microsoft 365 Agents SDK (Teams/Copilot Studio hosting):
 
 ---
 
-## Project Structure
+## 📁 Project Structure
 
 ```
 event-agent-example/
-├── agent.py                 # Core logic (recommend, explain, export, serve)
-├── agent.json               # Manifest (sessions, weights, features)
-├── core.py                  # Importable core functions
-├── settings.py              # Pydantic settings (includes Graph credentials)
-├── telemetry.py             # Application Insights integration
-├── errors.py                # Custom exception hierarchy
-├── pyproject.toml           # Project configuration
+├── 🎯 Core Engine
+│   ├── agent.py                      # CLI interface + command handlers
+│   ├── core.py                       # Core recommendation logic
+│   ├── agent.json                    # Event sessions catalog + scoring config
+│   ├── agent-declaration.json        # Agents SDK manifest
+│   └── agent.schema.json             # JSON schema validation
 │
-├── .github/workflows/       # GitHub Actions CI/CD
-│   ├── test.yml             # Pytest on PR/push
-│   ├── lint.yml             # Black, isort, pylint
-│   ├── deploy.yml           # Docker build & Azure deployment
-│   └── security.yml         # Bandit + Safety scans
+├── 🤖 Bot Framework Integration (NEW)
+│   ├── bot_handler.py                # Teams activity handler (539 lines)
+│   ├── bot_server.py                 # aiohttp HTTP server (223 lines)
+│   ├── agents_sdk_adapter.py         # Agents SDK adapter (539 lines)
+│   ├── teams-app.json                # Teams app manifest
+│   └── copilot-plugin.json           # Copilot Studio plugin manifest
 │
-├── deploy/                  # Docker & deployment
-│   ├── Dockerfile           # Multi-stage Docker build
-│   ├── docker-compose.yml   # Local development setup
-│   ├── nginx.conf           # Reverse proxy configuration
-│   └── .env.example         # Environment template
+├── 🌐 Microsoft Graph Integration
+│   ├── graph_service.py              # Calendar API client
+│   ├── graph_auth.py                 # MSAL authentication
+│   └── runner.py                     # Multi-mode runner (CLI, HTTP, Bot, m365-agent)
 │
-├── infra/                   # Azure infrastructure (Bicep)
-│   ├── main.bicep           # Azure resources definition
-│   ├── dev.bicepparam       # Development parameters
-│   ├── prod.bicepparam      # Production parameters
-│   └── README.md            # Deployment guide
+├── ⚙️ Configuration & Utilities
+│   ├── settings.py                   # Pydantic settings + environment config
+│   ├── telemetry.py                  # Application Insights integration
+│   ├── logging_config.py             # Structured logging
+│   └── errors.py                     # Custom exceptions
 │
-├── .devcontainer/           # VSCode Dev Container
-│   └── devcontainer.json    # Remote development config
+├── 🧪 Tests (147 tests passing)
+│   ├── test_agents_sdk.py            # SDK adapter tests
+│   ├── test_graph_service.py         # Graph API tests
+│   ├── test_core_graph.py            # Core logic tests
+│   ├── test_recommend.py             # Recommendation tests
+│   ├── test_security.py              # Security scanning tests
+│   └── ... (15+ test files)
 │
-├── docs/                    # Technical documentation
-│   ├── technical-guide.md
-│   ├── performance-guide.md
-│   ├── troubleshooting.md
-│   └── openapi-snippet.yaml
+├── 📚 Documentation
+│   ├── README.md                     # This file
+│   ├── QUICKSTART.md                 # Quick start guide
+│   ├── LOCAL_TESTING.md              # Multi-channel testing guide (NEW)
+│   ├── TEAMS_QUICK_REFERENCE.md      # Teams bot commands (NEW)
+│   ├── PHASE3_COMPLETION.md          # Implementation status (NEW)
+│   ├── PHASE3_INDEX.md               # Documentation index (NEW)
+│   ├── docs/
+│   │   ├── agents-sdk-setup.md       # Teams/Copilot integration (650+ lines)
+│   │   ├── deployment-guide.md       # Production deployment (500+ lines)
+│   │   ├── api-guide.md              # HTTP API reference
+│   │   ├── technical-guide.md        # Architecture deep dive
+│   │   └── troubleshooting.md        # Common issues
 │
-├── tests/                   # Test suite (147 tests)
-│   ├── test_recommend.py
-│   ├── test_security.py
-│   ├── test_telemetry.py
-│   └── ...
+├── 🏗️ Infrastructure
+│   ├── infra/
+│   │   ├── main.bicep                # Azure resources (App Service, Key Vault, etc.)
+│   │   ├── dev.bicepparam            # Development environment
+│   │   └── prod.bicepparam           # Production environment
+│   ├── deploy/
+│   │   ├── Dockerfile                # Multi-stage build
+│   │   ├── docker-compose.yml        # Local dev containers
+│   │   └── nginx.conf                # Reverse proxy
+│   └── .devcontainer/
+│       └── devcontainer.json         # VS Code dev containers
 │
-├── Makefile                 # Development commands
-├── setup.sh                 # One-command environment setup
-├── .pre-commit-config.yaml  # Pre-commit hooks
-├── .bandit                  # Security scanning config
-├── DEVELOPMENT.md           # Developer guide
-├── ROADMAP.md               # Implementation progress
+├── 🔄 CI/CD & Automation
+│   ├── .github/workflows/
+│   │   ├── test.yml                  # Pytest on every PR
+│   │   ├── lint.yml                  # Code quality checks
+│   │   ├── security.yml              # Security scans
+│   │   └── deploy.yml                # Azure deployment
+│   ├── Makefile                      # Development commands
+│   ├── setup.sh                      # One-command setup
+│   └── .pre-commit-config.yaml       # Git hooks
+│
+├── 📦 Dependencies
+│   ├── requirements.txt              # Production dependencies
+│   ├── requirements-dev.txt          # Development dependencies
+│   └── pyproject.toml                # Project metadata
+│
+└── 📊 Data & Assets
+    ├── assets/
+    │   ├── sample_itinerary.md       # Sample export output
+    │   └── sessions_external.json    # External event data
+    └── exports/                      # Generated itineraries
 └── README.md                # This file
 ```
 
