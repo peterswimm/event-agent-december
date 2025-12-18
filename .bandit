@@ -1,0 +1,11 @@
+[bandit]
+# Bandit configuration for security scanning
+exclude_dirs = /tests/,/venv/,/.venv/,/__pycache__/,/.pytest_cache/
+
+# B104: Possible binding to all interfaces (intentional for container)
+# B201: flask_debug_true (not using Flask)
+# B601: paramiko_calls (not using paramiko)
+skips = B104,B201,B601
+
+[bandit.formatters]
+txt.color = True

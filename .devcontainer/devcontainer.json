@@ -1,0 +1,57 @@
+{
+  "name": "Event Kit Development",
+  "image": "mcr.microsoft.com/devcontainers/python:3.11",
+  
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {},
+    "ghcr.io/devcontainers/features/azure-cli:1": {},
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+  },
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "ms-python.black-formatter",
+        "ms-azuretools.vscode-docker",
+        "ms-azuretools.vscode-bicep",
+        "humao.rest-client",
+        "tamasfe.even-better-toml",
+        "redhat.vscode-yaml",
+        "github.vscode-github-actions"
+      ],
+      "settings": {
+        "python.defaultInterpreterPath": "/usr/local/bin/python",
+        "python.testing.pytestEnabled": true,
+        "python.testing.unittestEnabled": false,
+        "python.linting.enabled": true,
+        "python.linting.pylintEnabled": true,
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+          "source.organizeImports": "explicit"
+        },
+        "[python]": {
+          "editor.formatOnSave": true,
+          "editor.rulers": [100]
+        }
+      }
+    }
+  },
+
+  "forwardPorts": [8010, 8011],
+  "portsAttributes": {
+    "8010": {
+      "label": "Event Kit HTTP (NGINX)",
+      "onAutoForward": "notify"
+    },
+    "8011": {
+      "label": "Event Kit HTTP (Python)",
+      "onAutoForward": "silent"
+    }
+  },
+
+  "postCreateCommand": "pip install --user -r requirements.txt -r requirements-dev.txt",
+
+  "remoteUser": "vscode"
+}

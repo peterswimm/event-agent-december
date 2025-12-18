@@ -1,0 +1,608 @@
+openapi: 3.0.3
+
+info:
+  title: Event Kit Agent API
+  description: |
+    Event Kit is a minimal declarative event recommendation agent that helps users discover relevant sessions based on their interests. 
+    
+    ## Features
+    - Recommend sessions based on interests
+    - Explain why a session matches your interests
+    - Export personalized itineraries to Markdown
+    - Graph-based recommendations (Microsoft Graph Calendar integration)
+    - Profile persistence with local storage
+    - Adaptive Card support for rich UI
+    
+    ## Authentication
+    The API supports bearer token authentication via the `Authorization` header:
+    ```
+    Authorization: Bearer YOUR_API_TOKEN
+    ```
+    
+    The API token is configured via the `API_TOKEN` environment variable. If not set, authentication is disabled.
+    
+    ## Rate Limiting
+    - **Limit**: 100 requests per minute per IP address
+    - **Headers**: Rate limit info in response headers (future enhancement)
+    - **Exceeded**: Returns 429 Too Many Requests
+    
+    ## Correlation IDs
+    All requests are tracked with correlation IDs for observability:
+    - Supply `X-Correlation-ID` header to track a request
+    - Or use W3C `traceparent` header (trace-id is extracted)
+    - Response includes `X-Correlation-ID` header for tracing
+    
+    ## CORS
+    The API supports Cross-Origin Resource Sharing (CORS) with:
+    - `Access-Control-Allow-Origin: *`
+    - Allowed methods: GET, POST, OPTIONS
+    - Exposed headers: X-Correlation-ID
+    
+  version: 1.0.0
+  contact:
+    name: Event Kit Support
+    url: https://github.com/peterswimm/event-agent-example
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: http://localhost:8010
+    description: Local development server
+  - url: https://{hostname}/
+    description: Production deployment
+    variables:
+      hostname:
+        description: Your deployed hostname
+        default: example.azurewebsites.net
+
+paths:
+  /health:
+    get:
+      summary: Health check endpoint
+      description: |
+        Returns the health status of the API. Used by load balancers and monitoring systems.
+        Performs a quick check to ensure the service is operational.
+      operationId: getHealth
+      tags:
+        - System
+      responses:
+        "200":
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                    example: "ok"
+                required:
+                  - status
+
+  /recommend:
+    get:
+      summary: Recommend sessions based on interests
+      description: |
+        Recommends sessions from the manifest based on user interests using a scoring algorithm
+        that considers interest matches, popularity, and conflict detection.
+      operationId: recommendSessions
+      tags:
+        - Recommendations
+      parameters:
+        - name: interests
+          in: query
+          description: |
+            Comma-separated list of interests to match against sessions.
+            Example: "artificial intelligence, machine learning, python"
+            At least one interest is required unless loading from a profile.
+          schema:
+            type: string
+            example: "agents, ai safety, machine learning"
+        - name: profileLoad
+          in: query
+          description: |
+            Profile ID to load interests from local storage instead of query parameter.
+            Useful for saved user preferences.
+          schema:
+            type: string
+            example: "user-profile-123"
+        - name: top
+          in: query
+          description: |
+            Maximum number of sessions to return.
+            Default: 5, Min: 1, Max: 50
+          schema:
+            type: integer
+            default: 5
+            minimum: 1
+            maximum: 50
+          example: 3
+        - name: card
+          in: query
+          description: |
+            If set to "1", includes an Adaptive Card representation of the recommendations
+            for use in Microsoft Teams or Copilot experiences.
+          schema:
+            type: string
+            enum: ["0", "1"]
+          example: "1"
+        - name: X-Correlation-ID
+          in: header
+          description: Optional correlation ID for request tracing
+          schema:
+            type: string
+            format: uuid
+        - name: Authorization
+          in: header
+          description: Bearer token for API authentication
+          schema:
+            type: string
+            pattern: "^Bearer "
+          example: "Bearer YOUR_API_TOKEN"
+
+      responses:
+        "200":
+          description: Successfully retrieved recommendations
+          headers:
+            X-Correlation-ID:
+              schema:
+                type: string
+                format: uuid
+              description: Correlation ID for tracing
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RecommendationResult"
+              examples:
+                success:
+                  value:
+                    sessions:
+                      - id: "session-001"
+                        title: "Generative Agents in Production"
+                        category: "AI"
+                        keywords:
+                          - "agents"
+                          - "generative"
+                          - "production"
+                        popularity: 95
+                        tags:
+                          - "advanced"
+                          - "industry-track"
+                    scoring:
+                      - sessionId: "session-001"
+                        score: 8.5
+                        matchedInterests:
+                          - "agents"
+                        confidenceLevel: 0.95
+                    conflicts: 0
+
+        "400":
+          description: Bad request - invalid parameters
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                noInterests:
+                  value:
+                    error: InvalidInputError
+                    message: "Must provide either interests or profileLoad parameter"
+                    statusCode: 400
+
+        "429":
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /recommend-graph:
+    get:
+      summary: Recommend sessions using Microsoft Graph Calendar events
+      description: |
+        Recommends sessions by analyzing events from the user's Microsoft Graph calendar.
+        Requires Graph API authentication credentials configured via environment variables.
+      operationId: recommendSessionsFromGraph
+      tags:
+        - Recommendations
+      parameters:
+        - name: interests
+          in: query
+          description: Comma-separated user interests for filtering recommendations
+          required: false
+          schema:
+            type: string
+            example: "cloud, security, devops"
+        - name: top
+          in: query
+          description: Maximum number of sessions to return
+          schema:
+            type: integer
+            default: 5
+            minimum: 1
+            maximum: 50
+        - name: userId
+          in: query
+          description: |
+            Optional user ID. If not provided, uses the configured GRAPH_USER_ID.
+          schema:
+            type: string
+        - name: X-Correlation-ID
+          in: header
+          description: Optional correlation ID for request tracing
+          schema:
+            type: string
+            format: uuid
+
+      responses:
+        "200":
+          description: Successfully retrieved Graph-based recommendations
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RecommendationResult"
+              examples:
+                success:
+                  value:
+                    sessions:
+                      - id: "session-002"
+                        title: "Cloud Security Best Practices"
+                        category: "Security"
+                        keywords:
+                          - "cloud"
+                          - "security"
+                        popularity: 87
+                        source: "graph"
+                    scoring:
+                      - sessionId: "session-002"
+                        score: 9.2
+                        matchedInterests:
+                          - "security"
+                          - "cloud"
+                        confidenceLevel: 0.98
+                    conflicts: 0
+
+        "400":
+          description: Bad request or Graph API not configured
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+        "401":
+          description: Graph API authentication failed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /explain:
+    get:
+      summary: Explain why a session matches user interests
+      description: |
+        Provides a detailed explanation of how a specific session matches
+        the user's interests, including matched keywords and relevance score.
+      operationId: explainSession
+      tags:
+        - Explanations
+      parameters:
+        - name: session
+          in: query
+          required: true
+          description: Session title to explain
+          schema:
+            type: string
+            example: "Generative Agents in Production"
+        - name: interests
+          in: query
+          description: Comma-separated user interests for comparison
+          schema:
+            type: string
+            example: "agents, ai, production"
+        - name: profileLoad
+          in: query
+          description: Profile ID to load interests from storage
+          schema:
+            type: string
+        - name: X-Correlation-ID
+          in: header
+          description: Optional correlation ID for request tracing
+          schema:
+            type: string
+            format: uuid
+
+      responses:
+        "200":
+          description: Successfully retrieved explanation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ExplanationResult"
+              examples:
+                success:
+                  value:
+                    session: "Generative Agents in Production"
+                    explanation: |
+                      This session matches 3 of your interests:
+                      - agents (exact match)
+                      - ai (related to generative)
+                      - production (exact match)
+                    matchedKeywords:
+                      - agents
+                      - production
+                      - generative
+                    relevanceScore: 0.92
+
+        "400":
+          description: Bad request - missing session or interests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /export:
+    get:
+      summary: Export recommended sessions as Markdown
+      description: |
+        Generates a personalized itinerary in Markdown format with recommended sessions
+        and their explanations. Optionally saves to persistent storage.
+      operationId: exportItinerary
+      tags:
+        - Export
+      parameters:
+        - name: interests
+          in: query
+          description: Comma-separated interests
+          schema:
+            type: string
+            example: "python, data science, distributed systems"
+        - name: profileLoad
+          in: query
+          description: Profile ID to load interests from storage
+          schema:
+            type: string
+        - name: profileSave
+          in: query
+          description: |
+            If provided, saves the current interests under this profile ID
+            for future use.
+          schema:
+            type: string
+        - name: X-Correlation-ID
+          in: header
+          description: Optional correlation ID for request tracing
+          schema:
+            type: string
+            format: uuid
+
+      responses:
+        "200":
+          description: Successfully exported itinerary
+          content:
+            text/markdown:
+              example: |
+                # My Recommended Itinerary
+                
+                ## Session 1: Generative Agents in Production
+                **Category**: AI  
+                **Relevance Score**: 0.92  
+                
+                Explanation: Matches your interests in agents and production systems...
+                
+                ## Session 2: AI Safety Considerations
+                **Category**: AI Safety  
+                **Relevance Score**: 0.88
+
+        "400":
+          description: Bad request - missing interests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+components:
+  schemas:
+    Session:
+      type: object
+      description: Event session information
+      properties:
+        id:
+          type: string
+          description: Unique session identifier
+          example: "session-001"
+        title:
+          type: string
+          description: Session title
+          example: "Generative Agents in Production"
+        category:
+          type: string
+          description: Session category
+          example: "AI"
+        description:
+          type: string
+          description: Session description
+          example: "Learn about deploying generative AI agents at scale"
+        keywords:
+          type: array
+          items:
+            type: string
+          description: Associated keywords
+          example: ["agents", "generative", "production"]
+        popularity:
+          type: integer
+          description: Popularity score (0-100)
+          minimum: 0
+          maximum: 100
+          example: 95
+        tags:
+          type: array
+          items:
+            type: string
+          description: Session tags for classification
+          example: ["advanced", "industry-track"]
+        source:
+          type: string
+          enum: [manifest, graph]
+          description: Where the session came from
+          example: "manifest"
+
+    ScoringResult:
+      type: object
+      description: Scoring details for a recommendation
+      properties:
+        sessionId:
+          type: string
+          example: "session-001"
+        score:
+          type: number
+          format: float
+          description: Recommendation score (0-10)
+          minimum: 0
+          maximum: 10
+          example: 8.5
+        matchedInterests:
+          type: array
+          items:
+            type: string
+          description: User interests that matched this session
+          example: ["agents", "ai"]
+        confidenceLevel:
+          type: number
+          format: float
+          description: Confidence of the recommendation (0-1)
+          minimum: 0
+          maximum: 1
+          example: 0.95
+
+    RecommendationResult:
+      type: object
+      description: Result of a recommendation query
+      required:
+        - sessions
+        - scoring
+      properties:
+        sessions:
+          type: array
+          items:
+            $ref: "#/components/schemas/Session"
+          description: Recommended sessions
+        scoring:
+          type: array
+          items:
+            $ref: "#/components/schemas/ScoringResult"
+          description: Scoring details for each session
+        conflicts:
+          type: integer
+          description: Number of scheduling conflicts detected
+          example: 0
+        correlationId:
+          type: string
+          format: uuid
+          description: Request correlation ID for tracing
+          example: "550e8400-e29b-41d4-a716-446655440000"
+
+    ExplanationResult:
+      type: object
+      description: Explanation for a session recommendation
+      properties:
+        session:
+          type: string
+          description: Session title explained
+          example: "Generative Agents in Production"
+        explanation:
+          type: string
+          description: Detailed explanation of the match
+          example: |
+            This session matches 3 of your interests:
+            - agents (exact match)
+            - ai (related)
+            - production (exact match)
+        matchedKeywords:
+          type: array
+          items:
+            type: string
+          description: Keywords from the session that matched
+          example: ["agents", "generative", "production"]
+        relevanceScore:
+          type: number
+          format: float
+          description: Overall relevance (0-1)
+          minimum: 0
+          maximum: 1
+          example: 0.92
+
+    ErrorResponse:
+      type: object
+      description: Error response
+      required:
+        - error
+        - message
+      properties:
+        error:
+          type: string
+          description: Error type/class name
+          enum:
+            - InvalidInputError
+            - RateLimitError
+            - GraphAuthError
+            - GraphAPIError
+            - EventKitError
+          example: InvalidInputError
+        message:
+          type: string
+          description: Error message
+          example: "Must provide either interests or profileLoad parameter"
+        statusCode:
+          type: integer
+          description: HTTP status code
+          example: 400
+        correlationId:
+          type: string
+          format: uuid
+          description: Request correlation ID for support
+          example: "550e8400-e29b-41d4-a716-446655440000"
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: |
+        Bearer token authentication using the API_TOKEN from environment.
+        Include in Authorization header: `Authorization: Bearer YOUR_TOKEN`
+
+  responses:
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+
+    Unauthorized:
+      description: Authentication failed
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+
+    TooManyRequests:
+      description: Rate limit exceeded
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+
+security:
+  - bearerAuth: []
+
+tags:
+  - name: System
+    description: System health and status endpoints
+  - name: Recommendations
+    description: Session recommendation endpoints
+  - name: Explanations
+    description: Explanation and analysis endpoints
+  - name: Export
+    description: Data export endpoints

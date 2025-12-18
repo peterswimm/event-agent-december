@@ -1,0 +1,97 @@
+{
+  "$schema": "https://aka.ms/azure-ai-agent-declaration-schema",
+  "version": "1.0",
+  "name": "EventKitAgent",
+  "description": "Event recommendation agent that helps users discover relevant sessions based on their interests. Provides personalized recommendations, explanations, and itinerary exports.",
+  "instructions": "You are an event recommendation assistant. Your role is to help users discover relevant conference sessions based on their interests. You can recommend sessions, explain why sessions match their interests, and export personalized itineraries. Always be helpful, accurate, and provide explanations for your recommendations.",
+  "capabilities": [
+    {
+      "name": "recommend_sessions",
+      "description": "Recommends conference sessions based on user interests. Returns a list of relevant sessions with scoring details.",
+      "type": "function",
+      "function": {
+        "name": "recommend_sessions",
+        "description": "Get personalized session recommendations based on interests",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "interests": {
+              "type": "string",
+              "description": "Comma-separated list of user interests (e.g., 'agents, ai safety, machine learning')"
+            },
+            "top": {
+              "type": "integer",
+              "description": "Maximum number of sessions to recommend",
+              "default": 5,
+              "minimum": 1,
+              "maximum": 50
+            },
+            "use_graph": {
+              "type": "boolean",
+              "description": "Whether to use Microsoft Graph calendar data for recommendations",
+              "default": false
+            }
+          },
+          "required": ["interests"]
+        }
+      }
+    },
+    {
+      "name": "explain_session",
+      "description": "Explains why a specific session matches the user's interests. Provides detailed reasoning and relevance scoring.",
+      "type": "function",
+      "function": {
+        "name": "explain_session",
+        "description": "Explain why a session matches user interests",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "session_title": {
+              "type": "string",
+              "description": "The title of the session to explain"
+            },
+            "interests": {
+              "type": "string",
+              "description": "Comma-separated list of user interests"
+            }
+          },
+          "required": ["session_title", "interests"]
+        }
+      }
+    },
+    {
+      "name": "export_itinerary",
+      "description": "Exports a personalized itinerary in Markdown format with recommended sessions.",
+      "type": "function",
+      "function": {
+        "name": "export_itinerary",
+        "description": "Export personalized itinerary to Markdown",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "interests": {
+              "type": "string",
+              "description": "Comma-separated list of user interests"
+            },
+            "profile_name": {
+              "type": "string",
+              "description": "Optional profile name to save preferences for future use"
+            }
+          },
+          "required": ["interests"]
+        }
+      }
+    }
+  ],
+  "model": {
+    "name": "gpt-4",
+    "temperature": 0.7,
+    "max_tokens": 2000
+  },
+  "metadata": {
+    "author": "Event Kit Team",
+    "version": "1.0.0",
+    "tags": ["events", "recommendations", "conference", "ai"],
+    "category": "productivity"
+  }
+}

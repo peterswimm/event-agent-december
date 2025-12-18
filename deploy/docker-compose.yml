@@ -8,10 +8,33 @@ services:
     ports:
       - "8010:8010"
     environment:
+      # Internal port for Python HTTP server
       - PORT=8011
+      # Optional: Application Insights connection string
+      - APP_INSIGHTS_CONNECTION_STRING=${APP_INSIGHTS_CONNECTION_STRING:-}
+      # Optional: API token for authentication
+      - API_TOKEN=${API_TOKEN:-}
+      # Optional: Graph API credentials
+      - GRAPH_TENANT_ID=${GRAPH_TENANT_ID:-}
+      - GRAPH_CLIENT_ID=${GRAPH_CLIENT_ID:-}
+      - GRAPH_CLIENT_SECRET=${GRAPH_CLIENT_SECRET:-}
+      - GRAPH_USER_ID=${GRAPH_USER_ID:-}
+    volumes:
+      # Persist telemetry logs
+      - ./data/logs:/app/logs
+      # Persist exports
+      - ./data/exports:/app/exports
+      # Persist profile data
+      - ./data/profiles:/app/data
     networks:
       - eventkit
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8010/health')"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
 
   # Optional: frontend dev server (only if actively developing UI)
   # Uncomment and run `docker compose up -d` to enable

@@ -1,0 +1,107 @@
+{
+  "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.16/MicrosoftTeams.schema.json",
+  "manifestVersion": "1.16",
+  "version": "1.0.0",
+  "id": "12345678-1234-1234-1234-123456789012",
+  "packageName": "com.example.eventkit",
+  "developer": {
+    "name": "Event Kit Team",
+    "websiteUrl": "https://github.com/peterswimm/event-agent-december",
+    "privacyUrl": "https://github.com/peterswimm/event-agent-december/blob/main/docs/privacy.md",
+    "termsOfUseUrl": "https://github.com/peterswimm/event-agent-december/blob/main/docs/terms.md"
+  },
+  "name": {
+    "short": "EventKit Agent",
+    "full": "Event Kit - AI Session Recommendation Agent"
+  },
+  "description": {
+    "short": "AI-powered event session recommendations based on your interests",
+    "full": "EventKit is an AI agent that provides personalized conference session recommendations using AI scoring and Microsoft Graph integration. Get smart recommendations, explanations, and export your personalized itinerary."
+  },
+  "icons": {
+    "outline": "assets/outline-icon-192.png",
+    "color": "assets/color-icon-192.png"
+  },
+  "accentColor": "#004578",
+  "staticTabs": [
+    {
+      "entityId": "conversations",
+      "name": "Recommendations",
+      "contentUrl": "https://teams.microsoft.com/l/entity/12345678-1234-1234-1234-123456789012",
+      "websiteUrl": "https://eventkit.example.com",
+      "scopes": ["personal"]
+    }
+  ],
+  "bots": [
+    {
+      "botId": "12345678-1234-1234-1234-123456789012",
+      "scopes": ["personal", "team"],
+      "commandLists": [
+        {
+          "scopes": ["personal", "team"],
+          "commands": [
+            {
+              "title": "recommend",
+              "description": "Get personalized session recommendations"
+            },
+            {
+              "title": "explain",
+              "description": "Explain why a session matches your interests"
+            },
+            {
+              "title": "export",
+              "description": "Export your personalized itinerary"
+            },
+            {
+              "title": "help",
+              "description": "Show available commands and examples"
+            }
+          ]
+        }
+      ],
+      "supportsFiles": false,
+      "isNotificationOnly": false
+    }
+  ],
+  "composeExtensions": [
+    {
+      "botId": "12345678-1234-1234-1234-123456789012",
+      "canUpdateConfiguration": true,
+      "commands": [
+        {
+          "id": "searchSessions",
+          "title": "Search Sessions",
+          "description": "Search and recommend sessions based on interests",
+          "initialRun": false,
+          "context": ["compose", "commandBox"],
+          "parameters": [
+            {
+              "name": "searchQuery",
+              "title": "Search for sessions",
+              "description": "Enter interests (e.g., 'agents, ai safety')",
+              "inputType": "text"
+            },
+            {
+              "name": "topResults",
+              "title": "Number of results",
+              "description": "How many sessions to return (1-10)",
+              "inputType": "number"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "permissions": [
+    "identity",
+    "messageTeamMembers"
+  ],
+  "validDomains": [
+    "*.example.com",
+    "tokens.botframework.com"
+  ],
+  "webApplicationInfo": {
+    "id": "12345678-1234-1234-1234-123456789012",
+    "resource": "api://eventkit.example.com/12345678-1234-1234-1234-123456789012"
+  }
+}

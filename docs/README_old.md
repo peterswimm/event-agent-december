@@ -1,114 +1,178 @@
-# Event Kit
+# Event Kit Documentation
 
-**Minimal declarative event recommendation agent** for Vibe Kit. Demonstrates core agent patterns with one manifest (`agent.json`) and one script (`agent.py`).
+Complete documentation for Event Kit - a lightweight event recommendation agent.
 
----
+## 🚀 Start Here
 
-## Overview
+**New to Event Kit?** → [00-START-HERE.md](00-START-HERE.md) — Choose your path based on your role
 
-Event Kit is a lightweight innovation kit showcasing:
+## Quick Access
 
-- **Declarative manifest**: Sessions, weights, and feature flags in JSON
-- **CLI + HTTP server**: Recommend, explain, export endpoints
-- **Adaptive Cards**: Interactive UI for Copilot experiences
-- **Telemetry**: Structured JSONL logging for observability
-- **Profile persistence**: Save/load user preferences
-- **External data override**: Swap in real event feeds
-- **Microsoft Graph integration**: Live calendar events with MSAL auth (NEW)
+| I want to... | Go to... |
+|--------------|----------|
+| Get started in 5 minutes | [Quick Start](01-GETTING-STARTED/quick-start.md) |
+| Set up production deployment | [Deployment Guide](05-PRODUCTION/deployment.md) |
+| Understand the scoring algorithm | [Scoring Algorithm](04-ARCHITECTURE/scoring-algorithm.md) |
+| Contribute code | [Contributing Guide](06-DEVELOPMENT/contributing.md) |
+| Use Microsoft Graph API | [Graph API Setup](03-GRAPH-API/setup.md) |
+| Run CLI commands | [CLI Usage](02-USER-GUIDES/cli-usage.md) |
+| Monitor in production | [Monitoring Guide](05-PRODUCTION/monitoring.md) |
+| Run tests | [Testing Guide](06-DEVELOPMENT/testing.md) |
 
----
+## Documentation Structure
 
-## How This Fits in Vibe Kit
-
-Vibe Kit is a repository of innovation kits designed to accelerate AI agent prototyping. Event Kit serves as:
-
-1. **Foundational example**: Minimal agent architecture (manifest + logic)
-2. **Starter for real integrations**: Easily extend to Microsoft Graph, SharePoint, or Agent SDK hosting
-3. **Pattern library**: Demonstrates scoring, conflict detection, adaptive cards, telemetry
-
-For production-ready Graph/SharePoint integration, see [`innovation-kit-repository/event-agent/`](../innovation-kit-repository/event-agent/) which includes:
-
-- Microsoft 365 Agents SDK hosting scaffold
-- Graph Calendar fetching with MSAL auth
-- SharePoint page publishing
-- Pydantic configuration with feature flags
-- Full setup guide in `MVP_GUIDE.md`
-
----
-
-## 📚 Documentation
-
-**Complete documentation is now available in organized, audience-focused guides:**
-
-👉 **[Start Here: docs/00-START-HERE.md](docs/00-START-HERE.md)** — Pick your path (User, Developer, DevOps)
-
-Quick links:
-
-- 🚀 [5-Minute Quick Start](docs/01-GETTING-STARTED/quick-start.md)
-- 📖 [Installation Guide](docs/01-GETTING-STARTED/installation.md)
-- � [API Documentation](docs/api-guide.md) - Full reference with 100+ examples
-- �📋 [Command Reference](docs/REFERENCE.md)
-- 📅 [Graph API Setup](docs/03-GRAPH-API/setup.md)
-- 🆘 [Troubleshooting](docs/03-GRAPH-API/troubleshooting.md)
-
----
-
-## API Overview
-
-| Endpoint | Method | Purpose |
-|----------|--------|---------|
-| `/health` | GET | Health check |
-| `/recommend` | GET | Get personalized recommendations |
-| `/explain` | GET | Understand why a session matches |
-| `/export` | GET | Export itinerary to Markdown |
-| `/recommend-graph` | GET | Calendar-based recommendations |
-
-**Example**: `curl "http://localhost:8010/recommend?interests=agents&top=3"`
-
-**Full documentation with 100+ code examples**: [docs/api-guide.md](docs/api-guide.md)
-
----
-
-## Quick Start
-
-### 1. Run Locally (No Setup)
-
-```bash
-cd event-agent-example
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Recommend sessions
-python agent.py recommend --interests "agents, ai safety" --top 3
-
-# Explain a session
-python agent.py explain --session "Generative Agents in Production" --interests "agents, gen ai"
-
-# Export itinerary
-python agent.py export --interests "agents, privacy" --output my_itinerary.md
-
-# Start HTTP server
-python agent.py serve --port 8010 --card
+```text
+docs/
+├── 00-START-HERE.md              # 👈 Start here! Audience selector
+├── 01-GETTING-STARTED/           # Setup and configuration
+│   ├── quick-start.md
+│   ├── installation.md
+│   └── configuration.md
+├── 02-USER-GUIDES/               # Using Event Kit
+│   ├── cli-usage.md
+│   └── http-api.md
+├── 03-GRAPH-API/                 # Microsoft Graph integration
+│   ├── setup.md
+│   ├── architecture.md
+│   └── troubleshooting.md
+├── 04-ARCHITECTURE/              # System design
+│   ├── design.md
+│   ├── modules.md
+│   ├── scoring-algorithm.md
+│   └── patterns.md
+├── 05-PRODUCTION/                # Deployment and operations
+│   ├── deployment.md
+│   ├── performance.md
+│   ├── security.md
+│   └── monitoring.md
+├── 06-DEVELOPMENT/               # Contributing
+│   ├── contributing.md
+│   ├── testing.md
+│   └── architecture-decisions.md
+└── REFERENCE.md                  # Complete reference
 ```
 
-Test endpoints:
+## By Audience
 
-```bash
-curl http://localhost:8010/health
-curl "http://localhost:8010/recommend?interests=agents,ai+safety&top=3&card=1"
-curl "http://localhost:8010/explain?session=Generative+Agents+in+Production&interests=agents,gen+ai"
-```
+### 👤 End Users
 
-### 2. Profile Persistence
+**Goal:** Use Event Kit to get personalized event recommendations
 
-```bash
-# Save interests for later
-python agent.py recommend --interests "agents, telemetry" --profile-save demo
+1. [Quick Start](01-GETTING-STARTED/quick-start.md) — Get up and running
+2. [CLI Usage](02-USER-GUIDES/cli-usage.md) — Command reference
+3. [HTTP API](02-USER-GUIDES/http-api.md) — API endpoints
+4. [Graph API Setup](03-GRAPH-API/setup.md) — Connect to Microsoft Graph
 
-# Load saved profile
-python agent.py recommend --profile-load demo --top 5
-```
+### 👨‍💻 Developers
+
+**Goal:** Understand, modify, and extend Event Kit
+
+1. [Installation](01-GETTING-STARTED/installation.md) — Full dev setup
+2. [Architecture Design](04-ARCHITECTURE/design.md) — System overview
+3. [Modules Reference](04-ARCHITECTURE/modules.md) — Code structure
+4. [Scoring Algorithm](04-ARCHITECTURE/scoring-algorithm.md) — How recommendations work
+5. [Application Patterns](04-ARCHITECTURE/patterns.md) — Common workflows
+6. [Contributing Guide](06-DEVELOPMENT/contributing.md) — How to contribute
+7. [Testing Guide](06-DEVELOPMENT/testing.md) — Test suite
+8. [Architecture Decisions](06-DEVELOPMENT/architecture-decisions.md) — Design rationale
+
+### ⚙️ DevOps / Operations
+
+**Goal:** Deploy, monitor, and maintain Event Kit in production
+
+1. [Configuration](01-GETTING-STARTED/configuration.md) — Environment setup
+2. [Deployment Guide](05-PRODUCTION/deployment.md) — Production deployment
+3. [Performance Guide](05-PRODUCTION/performance.md) — Optimization
+4. [Security Guide](05-PRODUCTION/security.md) — Security hardening
+5. [Monitoring Guide](05-PRODUCTION/monitoring.md) — Observability
+6. [Graph API Troubleshooting](03-GRAPH-API/troubleshooting.md) — Common issues
+
+## By Topic
+
+### Getting Started
+
+- [00-START-HERE.md](00-START-HERE.md) — Choose your path
+- [Quick Start](01-GETTING-STARTED/quick-start.md) — 5-minute setup
+- [Installation](01-GETTING-STARTED/installation.md) — Full setup guide
+- [Configuration](01-GETTING-STARTED/configuration.md) — Environment setup
+
+### Using Event Kit
+
+- [CLI Usage](02-USER-GUIDES/cli-usage.md) — Command reference
+- [HTTP API](02-USER-GUIDES/http-api.md) — API endpoints
+- [Application Patterns](04-ARCHITECTURE/patterns.md) — Common workflows
+
+### Microsoft Graph Integration
+
+- [Graph API Setup](03-GRAPH-API/setup.md) — Azure AD configuration
+- [Graph Architecture](03-GRAPH-API/architecture.md) — How it works
+- [Graph Troubleshooting](03-GRAPH-API/troubleshooting.md) — Common issues
+
+### Architecture & Design
+
+- [System Design](04-ARCHITECTURE/design.md) — Architecture overview
+- [Module Reference](04-ARCHITECTURE/modules.md) — Code structure
+- [Scoring Algorithm](04-ARCHITECTURE/scoring-algorithm.md) — Recommendation engine
+- [Application Patterns](04-ARCHITECTURE/patterns.md) — Usage patterns
+- [Architecture Decisions](06-DEVELOPMENT/architecture-decisions.md) — ADRs
+
+### Production Operations
+
+- [Deployment Guide](05-PRODUCTION/deployment.md) — Deploy to production
+- [Performance Guide](05-PRODUCTION/performance.md) — Optimize performance
+- [Security Guide](05-PRODUCTION/security.md) — Security best practices
+- [Monitoring Guide](05-PRODUCTION/monitoring.md) — Observability setup
+
+### Development
+
+- [Contributing Guide](06-DEVELOPMENT/contributing.md) — Contribution workflow
+- [Testing Guide](06-DEVELOPMENT/testing.md) — Test suite details
+- [Architecture Decisions](06-DEVELOPMENT/architecture-decisions.md) — Design rationale
+
+### Reference
+
+- [Complete Reference](REFERENCE.md) — Comprehensive command/API/config reference
+
+## Getting Help
+
+### Documentation Issues
+
+- **Missing information?** Open an issue
+- **Unclear explanation?** Suggest improvement
+- **Found an error?** Submit a PR with fix
+
+### Support Channels
+
+- **GitHub Issues** — Bug reports, feature requests
+- **GitHub Discussions** — Questions, community support
+
+## Contributing to Docs
+
+See [Contributing Guide](06-DEVELOPMENT/contributing.md) for how to improve documentation.
+
+## Changelog
+
+**2024-12-16:** Documentation reorganization complete
+
+- Consolidated 18 docs into audience-based structure
+- Added comprehensive guides for all audiences
+- Created entry point (00-START-HERE.md)
+- Archived old planning docs
+
+## Next Steps
+
+**Never been here before?**
+
+👉 Start with [00-START-HERE.md](00-START-HERE.md)
+
+**Know what you need?**
+
+👉 Use the quick access table above
+
+**Want everything?**
+
+👉 Check out [REFERENCE.md](REFERENCE.md)
+
 
 Profiles stored in `~/.event_agent_profiles.json`.
 
@@ -118,86 +182,7 @@ Profiles stored in `~/.event_agent_profiles.json`.
 python -m pytest eventkit/tests -q
 ```
 
-All 147 tests should pass (126 original + 21 security tests).
-
----
-
-## Development Workflow
-
-### Quick Commands
-
-**One-command setup**:
-
-```bash
-bash setup.sh
-```
-
-**Make commands**:
-
-```bash
-make help          # Show all available commands
-make install       # Install dependencies
-make dev           # Install dev dependencies + pre-commit hooks
-make test          # Run tests with coverage
-make lint          # Check code quality
-make format        # Auto-format code
-make run           # Start the server locally
-make docker-run    # Run in Docker
-make deploy-dev    # Deploy to Azure (dev environment)
-```
-
-**See [DEVELOPMENT.md](DEVELOPMENT.md) for complete guide.**
-
-### GitHub Actions CI/CD
-
-Automated workflows run on every push and PR:
-
-- **Tests** (`test.yml`): Pytest with coverage on PR/push
-- **Linting** (`lint.yml`): Black, isort, pylint checks
-- **Security** (`security.yml`): Weekly Bandit + Safety scans
-- **Deploy** (`deploy.yml`): Auto-deploy to Azure on merge to main
-
-**Configuration**: See [.github/workflows/README.md](.github/workflows/README.md)
-
-### Pre-commit Hooks
-
-Automatically run code quality checks before commits:
-
-```bash
-pre-commit install
-pre-commit run --all-files
-```
-
-**Checks**: Black, isort, pylint, bandit, pytest
-
----
-
-## Docker & Azure Deployment
-
-**Local Docker**:
-
-```bash
-make docker-build
-make docker-run
-make docker-logs
-```
-
-**Deploy to Azure**:
-
-```bash
-make deploy-dev      # Development
-make deploy-prod     # Production
-```
-
-Includes:
-
-- Multi-stage Docker build (optimized size)
-- Azure App Service with managed identity
-- Key Vault for secrets
-- Application Insights for monitoring
-- Log Analytics for centralized logging
-
-**Infrastructure**: [infra/README.md](infra/README.md)
+All 7 tests should pass (recommend, explain, export, profile, server, telemetry, external sessions).
 
 ---
 
@@ -296,56 +281,66 @@ To integrate with Microsoft 365 Agents SDK (Teams/Copilot Studio hosting):
 ## Project Structure
 
 ```
-event-agent-example/
+eventkit/
 ├── agent.py                 # Core logic (recommend, explain, export, serve)
 ├── agent.json               # Manifest (sessions, weights, features)
-├── core.py                  # Importable core functions
-├── settings.py              # Pydantic settings (includes Graph credentials)
-├── telemetry.py             # Application Insights integration
-├── errors.py                # Custom exception hierarchy
-├── pyproject.toml           # Project configuration
-│
-├── .github/workflows/       # GitHub Actions CI/CD
-│   ├── test.yml             # Pytest on PR/push
-│   ├── lint.yml             # Black, isort, pylint
-│   ├── deploy.yml           # Docker build & Azure deployment
-│   └── security.yml         # Bandit + Safety scans
-│
-├── deploy/                  # Docker & deployment
-│   ├── Dockerfile           # Multi-stage Docker build
-│   ├── docker-compose.yml   # Local development setup
-│   ├── nginx.conf           # Reverse proxy configuration
-│   └── .env.example         # Environment template
-│
-├── infra/                   # Azure infrastructure (Bicep)
-│   ├── main.bicep           # Azure resources definition
-│   ├── dev.bicepparam       # Development parameters
-│   ├── prod.bicepparam      # Production parameters
-│   └── README.md            # Deployment guide
-│
-├── .devcontainer/           # VSCode Dev Container
-│   └── devcontainer.json    # Remote development config
-│
-├── docs/                    # Technical documentation
+├── telemetry.py             # JSONL logging module
+├── pyproject.toml           # Packaging (console script: "eventkit")
+├── EVENT_KIT.md             # Quick start overview
+├── QUICKSTART.md            # Detailed CLI/server usage
+├── runner.py                # Unified runner for mutually exclusive modes
+├── core.py                  # Importable core functions (recommend, explain)
+├── settings.py              # Pydantic settings (RUN_MODE, API_TOKEN, APP_INSIGHTS_CONNECTION_STRING)
+├── agent.schema.json        # JSON Schema for manifest validation
+├── tests/                   # Pytest suite (7 tests)
+│   ├── test_recommend.py
+│   ├── test_explain.py
+│   ├── test_export.py
+│   ├── test_profile.py
+│   ├── test_server.py
+│   ├── test_telemetry.py
+│   └── test_external_sessions.py
+├── docs/                    # Technical guides
 │   ├── technical-guide.md
 │   ├── performance-guide.md
 │   ├── troubleshooting.md
+│   ├── application-patterns.md
+│   ├── data-integration.md
+│   ├── evaluation.md
+│   ├── governance.md
 │   └── openapi-snippet.yaml
-│
-├── tests/                   # Test suite (147 tests)
-│   ├── test_recommend.py
-│   ├── test_security.py
-│   ├── test_telemetry.py
-│   └── ...
-│
-├── Makefile                 # Development commands
-├── setup.sh                 # One-command environment setup
-├── .pre-commit-config.yaml  # Pre-commit hooks
-├── .bandit                  # Security scanning config
-├── DEVELOPMENT.md           # Developer guide
-├── ROADMAP.md               # Implementation progress
-└── README.md                # This file
+├── scripts/                 # Utilities
+│   ├── evaluate_profiles.py
+│   ├── export_itinerary.py
+│   ├── generate_sessions_template.py
+│   └── summarize_telemetry.py
+└── assets/                  # Sample data
+    ├── sample_itinerary.md
+    └── sessions_external.json
 ```
+
+---
+
+## Run Modes (Mutually Exclusive)
+
+Use the unified runner to select the mode:
+
+- `custom-chat`: Minimal HTTP server with optional MCP tools
+
+  ```bash
+  eventkit-runner --mode custom-chat --port 8010 --card
+  ```
+
+- `m365-agent`: Microsoft 365 Agents SDK host (Teams/Copilot Studio)
+
+  ```bash
+  # Required env: GRAPH_TENANT_ID, GRAPH_CLIENT_ID, GRAPH_CLIENT_SECRET
+  eventkit-runner --mode m365-agent --port 3978
+  ```
+
+- `sharepoint-agent`: Publish itineraries to SharePoint (no chat hosting)
+
+- `directline-adapter`: Bot Framework Direct Line/Web Chat adapter
 
   ```bash
   # Requires: MICROSOFT_APP_ID, MICROSOFT_APP_PASSWORD; optional AGENT_API_BASE

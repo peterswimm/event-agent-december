@@ -32,6 +32,110 @@ except Exception:  # pragma: no cover
     GRAPH_AVAILABLE = False  # Graph dependencies not available
 
 
+class SecurityValidator:
+    """Input validation for security hardening."""
+    
+    MAX_INTERESTS_LENGTH = 500
+    MAX_USER_ID_LENGTH = 255
+    MAX_TITLE_LENGTH = 200
+    VALID_INTERESTS_PATTERN = r'^[a-zA-Z0-9\s,\-]+$'
+    VALID_EMAIL_PATTERN = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+    VALID_TITLE_PATTERN = r'^[a-zA-Z0-9\s,\-:?!\(\)\'\.]+$'
+    
+    @staticmethod
+    def validate_interests(interests: str) -> tuple[bool, str]:
+        """Validate interests string."""
+        import re
+        
+        if not interests or not interests.strip():
+            return False, "Interests cannot be empty"
+        
+        if len(interests) > SecurityValidator.MAX_INTERESTS_LENGTH:
+            return False, f"Interests too long (max {SecurityValidator.MAX_INTERESTS_LENGTH} chars)"
+        
+        if not re.match(SecurityValidator.VALID_INTERESTS_PATTERN, interests):
+            return False, "Interests contain invalid characters"
+        
+        return True, ""
+    
+    @staticmethod
+    def validate_user_id(user_id: str) -> tuple[bool, str]:
+        """Validate user ID (email format)."""
+        import re
+        
+        if not user_id or not user_id.strip():
+            return False, "User ID cannot be empty"
+        
+        if len(user_id) > SecurityValidator.MAX_USER_ID_LENGTH:
+            return False, f"User ID too long (max {SecurityValidator.MAX_USER_ID_LENGTH} chars)"
+        
+        if not re.match(SecurityValidator.VALID_EMAIL_PATTERN, user_id):
+            return False, "User ID must be a valid email address"
+        
+        return True, ""
+    
+    @staticmethod
+    def validate_session_title(title: str) -> tuple[bool, str]:
+        """Validate session title."""
+        import re
+        
+        if not title or not title.strip():
+            return False, "Session title cannot be empty"
+        
+        if len(title) > SecurityValidator.MAX_TITLE_LENGTH:
+            return False, f"Session title too long (max {SecurityValidator.MAX_TITLE_LENGTH} chars)"
+        
+        if not re.match(SecurityValidator.VALID_TITLE_PATTERN, title):
+            return False, "Session title contains invalid characters"
+        
+        return True, ""
+
+
+class RateLimiter:
+    """Simple in-memory rate limiter."""
+    
+    def __init__(self, requests_per_minute: int = 100, window_seconds: int = 60):
+        """Initialize rate limiter.
+        
+        Args:
+            requests_per_minute: Maximum requests allowed per minute
+            window_seconds: Time window for rate limiting in seconds
+        """
+        self.requests_per_minute = requests_per_minute
+        self.window_seconds = window_seconds
+        self.request_log: Dict[str, List[float]] = {}
+    
+    def is_allowed(self, ip: str) -> bool:
+        """Check if request from IP is allowed."""
+        now = time.time()
+        
+        # Initialize IP log if needed
+        if ip not in self.request_log:
+            self.request_log[ip] = []
+        
+        # Remove old requests outside the window
+        self.request_log[ip] = [
+            ts for ts in self.request_log[ip]
+            if now - ts < self.window_seconds
+        ]
+        
+        # Check if under limit
+        if len(self.request_log[ip]) < self.requests_per_minute:
+            self.request_log[ip].append(now)
+            return True
+        
+        return False
+    
+    def cleanup_old_entries(self) -> None:
+        """Remove IPs with no recent requests."""
+        now = time.time()
+        self.request_log = {
+            ip: timestamps
+            for ip, timestamps in self.request_log.items()
+            if any(now - ts < self.window_seconds for ts in timestamps)
+        }
+
+
 def load_manifest(path: pathlib.Path = MANIFEST_PATH) -> Dict[str, Any]:
     return json.loads(path.read_text())
 
@@ -420,19 +524,48 @@ def main() -> None:
             storage_file = manifest.get("profile", {}).get("storage_file")
 
             class Handler(BaseHTTPRequestHandler):
+                def _get_correlation_id(self) -> str:
+                    """Extract or generate a correlation ID for the current request."""
+                    # W3C traceparent: 00-<trace-id>-<span-id>-<flags>
+                    traceparent = self.headers.get("traceparent")
+                    if traceparent:
+                        try:
+                            parts = traceparent.split("-")
+                            if len(parts) >= 2 and parts[1]:
+                                return parts[1]
+                        except Exception:
+                            pass
+                    cid = self.headers.get("X-Correlation-ID")
+                    if cid:
+                        return cid
+                    if t:
+                        try:
+                            return t.generate_correlation_id()  # type: ignore[attr-defined]
+                        except Exception:
+                            pass
+                    import uuid
+                    return str(uuid.uuid4())
+
                 def _send(
                     self,
                     code: int,
                     payload: Dict[str, Any],
                     start_ts: float | None = None,
                     action: str | None = None,
+                    correlation_id: Optional[str] = None,
                 ):
+                    if correlation_id is None:
+                        correlation_id = self._get_correlation_id()
                     body = json.dumps(payload).encode()
                     self.send_response(code)
                     self.send_header("Content-Type", "application/json")
                     self.send_header("Content-Length", str(len(body)))
                     # CORS for webchat
                     self.send_header("Access-Control-Allow-Origin", "*")
+                    # Expose correlation header to browser clients
+                    self.send_header("Access-Control-Expose-Headers", "X-Correlation-ID")
+                    # Include correlation ID in responses
+                    self.send_header("X-Correlation-ID", correlation_id)
                     self.end_headers()
                     self.wfile.write(body)
                     if t and action:
@@ -442,9 +575,11 @@ def main() -> None:
                             start_ts,
                             success=(code == 200 and "error" not in payload),
                             error=payload.get("error"),
+                            correlation_id=correlation_id,
                         )
 
                 def do_GET(self):  # noqa: N802
+                    correlation_id = self._get_correlation_id()
                     parsed = urllib.parse.urlparse(self.path)
                     qs = urllib.parse.parse_qs(parsed.query)
                     path = parsed.path
@@ -459,10 +594,11 @@ def main() -> None:
                                 {"error": "unauthorized"},
                                 time.time(),
                                 "unauthorized",
+                                correlation_id,
                             )
                             return
                     if path == "/health":
-                        self._send(200, {"status": "ok"}, time.time(), "health")
+                        self._send(200, {"status": "ok"}, time.time(), "health", correlation_id)
                         return
                     if path == "/recommend":
                         start = time.time()
@@ -481,6 +617,7 @@ def main() -> None:
                                 {"error": "no interests provided"},
                                 start,
                                 "recommend",
+                                correlation_id,
                             )
                             return
                         top_n = (
@@ -493,7 +630,7 @@ def main() -> None:
                             result["adaptiveCard"] = _build_adaptive_card(
                                 result["sessions"]
                             )
-                        self._send(200, result, start, "recommend")
+                        self._send(200, result, start, "recommend", correlation_id)
                         return
                     if path == "/explain":
                         start = time.time()
@@ -511,7 +648,7 @@ def main() -> None:
                             )
                             return
                         result = explain(manifest, session_title, interests)
-                        self._send(200, result, start, "explain")
+                        self._send(200, result, start, "explain", correlation_id)
                         return
                     if path == "/recommend-graph":
                         if not GRAPH_AVAILABLE:
@@ -520,6 +657,7 @@ def main() -> None:
                                 {"error": "Graph API support not available"},
                                 time.time(),
                                 "recommend_graph",
+                                correlation_id,
                             )
                             return
                         start = time.time()
@@ -536,6 +674,7 @@ def main() -> None:
                                 {"error": "no interests provided"},
                                 start,
                                 "recommend_graph",
+                                correlation_id,
                             )
                             return
                         try:
@@ -550,6 +689,7 @@ def main() -> None:
                                     },
                                     start,
                                     "recommend_graph",
+                                    correlation_id,
                                 )
                                 return
                             auth_client = GraphAuthClient(settings)
@@ -568,7 +708,7 @@ def main() -> None:
                                 result["adaptiveCard"] = _build_adaptive_card(
                                     result["sessions"]
                                 )
-                            self._send(200, result, start, "recommend_graph")
+                            self._send(200, result, start, "recommend_graph", correlation_id)
                             return
                         except (GraphAuthError, GraphServiceError) as e:
                             self._send(
@@ -576,6 +716,7 @@ def main() -> None:
                                 {"error": f"Graph API error: {str(e)}"},
                                 start,
                                 "recommend_graph",
+                                correlation_id,
                             )
                             return
                         except ValueError as e:
@@ -584,6 +725,7 @@ def main() -> None:
                                 {"error": str(e)},
                                 start,
                                 "recommend_graph",
+                                correlation_id,
                             )
                             return
                     if path == "/export":
@@ -616,9 +758,9 @@ def main() -> None:
                             path = out_dir / f"itinerary_{'_'.join(interests[:3])}.md"
                             path.write_text(md)
                             response["saved"] = str(path)
-                        self._send(200, response, start, "export")
+                        self._send(200, response, start, "export", correlation_id)
                         return
-                    self._send(404, {"error": "not found"}, time.time(), "unknown")
+                    self._send(404, {"error": "not found"}, time.time(), "unknown", correlation_id)
 
                 def log_message(self, fmt, *a):
                     return

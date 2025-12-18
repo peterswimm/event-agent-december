@@ -1,0 +1,118 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/teams/v1.16/MicrosoftTeams.schema.json",
+  "manifestVersion": "1.16",
+  "version": "1.0.0",
+  "id": "87654321-4321-4321-4321-210987654321",
+  "packageName": "com.example.eventkit.copilot",
+  "developer": {
+    "name": "Event Kit Team",
+    "websiteUrl": "https://github.com/peterswimm/event-agent-december",
+    "privacyUrl": "https://github.com/peterswimm/event-agent-december/blob/main/docs/privacy.md",
+    "termsOfUseUrl": "https://github.com/peterswimm/event-agent-december/blob/main/docs/terms.md"
+  },
+  "name": {
+    "short": "EventKit",
+    "full": "Event Kit - Copilot Plugin for Conference Sessions"
+  },
+  "description": {
+    "short": "Get AI-powered session recommendations for conferences",
+    "full": "EventKit Copilot plugin provides intelligent session discovery using AI scoring. Ask for recommendations based on your interests and get personalized suggestions with scoring details."
+  },
+  "icons": {
+    "outline": "assets/outline-icon-192.png",
+    "color": "assets/color-icon-192.png"
+  },
+  "accentColor": "#004578",
+  "composeExtensions": [
+    {
+      "botId": "87654321-4321-4321-4321-210987654321",
+      "canUpdateConfiguration": true,
+      "commands": [
+        {
+          "id": "searchSessions",
+          "title": "Search Sessions",
+          "description": "Find and recommend sessions based on your interests",
+          "initialRun": true,
+          "context": ["compose", "commandBox"],
+          "parameters": [
+            {
+              "name": "searchQuery",
+              "title": "What are you interested in?",
+              "description": "e.g., 'agents, AI safety, machine learning'",
+              "inputType": "text",
+              "value": ""
+            },
+            {
+              "name": "maxResults",
+              "title": "Number of suggestions",
+              "description": "How many sessions to suggest (1-10)",
+              "inputType": "number",
+              "value": "5"
+            },
+            {
+              "name": "useCalendarData",
+              "title": "Use calendar data",
+              "description": "Include sessions you're already attending",
+              "inputType": "toggle",
+              "value": "false"
+            }
+          ]
+        },
+        {
+          "id": "explainSession",
+          "title": "Explain Session Match",
+          "description": "Understand why a session matches your interests",
+          "initialRun": false,
+          "context": ["compose", "commandBox"],
+          "parameters": [
+            {
+              "name": "sessionTitle",
+              "title": "Session title",
+              "description": "Name of the session to explain",
+              "inputType": "text"
+            },
+            {
+              "name": "userInterests",
+              "title": "Your interests",
+              "description": "Comma-separated list of your interests",
+              "inputType": "text"
+            }
+          ]
+        },
+        {
+          "id": "exportItinerary",
+          "title": "Export Itinerary",
+          "description": "Create your personalized conference agenda",
+          "initialRun": false,
+          "context": ["compose", "commandBox"],
+          "parameters": [
+            {
+              "name": "interests",
+              "title": "Your interests",
+              "description": "What topics interest you?",
+              "inputType": "text"
+            },
+            {
+              "name": "saveName",
+              "title": "Save as profile",
+              "description": "Optional: Save for future use",
+              "inputType": "text"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "permissions": [
+    "identity",
+    "messageTeamMembers"
+  ],
+  "validDomains": [
+    "*.example.com",
+    "tokens.botframework.com"
+  ],
+  "webApplicationInfo": {
+    "id": "87654321-4321-4321-4321-210987654321",
+    "resource": "api://eventkit-copilot.example.com/87654321-4321-4321-4321-210987654321"
+  }
+}
