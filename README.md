@@ -146,6 +146,7 @@ python agent_framework_adapter.py
 ### Quick Start
 
 - 🚀 **[QUICKSTART.md](QUICKSTART.md)** - Get started in 5 minutes
+- 🎯 **[docs/DECISION_GUIDE.md](docs/DECISION_GUIDE.md)** - Choose the right integration pattern & platform ⭐
 - 💻 **[DEVELOPMENT.md](DEVELOPMENT.md)** - Development setup & workflow
 - 🧪 **[LOCAL_TESTING.md](LOCAL_TESTING.md)** - Multi-channel testing guide
 
@@ -159,7 +160,6 @@ python agent_framework_adapter.py
 - 🤖 **[docs/agents-sdk-setup.md](docs/agents-sdk-setup.md)** - Teams/Copilot integration · [MS Learn](https://learn.microsoft.com/azure/bot-service/bot-builder-basics)
 - 🏭 **[docs/foundry-deployment.md](docs/foundry-deployment.md)** - Azure AI Foundry deployment · [MS Learn](https://learn.microsoft.com/azure/ai-studio/)
 - 🚀 **[docs/deployment-guide.md](docs/deployment-guide.md)** - Production deployment · [MS Learn](https://learn.microsoft.com/azure/app-service/)
-- 🔄 **[docs/AGENTS_M365_COPILOT_MIGRATION.md](docs/AGENTS_M365_COPILOT_MIGRATION.md)** - Microsoft SDK migration guide
 
 ### API & Testing
 
@@ -928,12 +928,12 @@ event-agent-example/
 │   ├── docs/
 │   │   ├── UNIFIED_ADAPTER_ARCHITECTURE.md  # Unified adapters (NEW)
 │   │   ├── EXTENSIBILITY_GUIDE.md    # Power Platform integration
-│   │   ├── AGENTS_M365_COPILOT_MIGRATION.md # Microsoft SDK migration
 │   │   ├── TESTING_GUIDE.md          # Comprehensive testing
 │   │   ├── agents-sdk-setup.md       # Teams/Copilot integration
-│   │   ├── deployment-guide.md       # Production deployment (500+ lines)
+│   │   ├── foundry-deployment.md     # Azure AI Foundry deployment
+│   │   ├── deployment-guide.md       # Production deployment
 │   │   ├── api-guide.md              # HTTP API reference
-│   │   ├── technical-guide.md        # Architecture deep dive
+│   │   ├── api-examples.md           # API usage examples
 │   │   └── troubleshooting.md        # Common issues
 │
 ├── 🏗️ Infrastructure
@@ -1132,7 +1132,9 @@ Adjust behavior in `agent.json > features`:
 **Architecture & Integration**:
 - **[docs/UNIFIED_ADAPTER_ARCHITECTURE.md](docs/UNIFIED_ADAPTER_ARCHITECTURE.md)** ⭐ - Unified adapter pattern (Azure AI Foundry, Power Platform, Bot Framework)
 - **[docs/EXTENSIBILITY_GUIDE.md](docs/EXTENSIBILITY_GUIDE.md)** - Power Platform, Azure Functions, declarative agents
-- **[docs/AGENTS_M365_COPILOT_MIGRATION.md](docs/AGENTS_M365_COPILOT_MIGRATION.md)** - Microsoft Agents-M365Copilot SDK migration
+- **[docs/agents-sdk-setup.md](docs/agents-sdk-setup.md)** - Teams/Copilot integration
+- **[docs/foundry-deployment.md](docs/foundry-deployment.md)** - Azure AI Foundry deployment
+- **[docs/deployment-guide.md](docs/deployment-guide.md)** - Production deployment
 
 **Testing & Quality**:
 - **[docs/TESTING_GUIDE.md](docs/TESTING_GUIDE.md)** - Comprehensive testing guide (20 test files, 190+ tests)
