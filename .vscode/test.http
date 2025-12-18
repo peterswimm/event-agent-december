@@ -1,0 +1,84 @@
+### EventKit API Test Suite
+### Use REST Client extension to send requests
+
+@host = http://localhost:8010
+@botHost = http://localhost:3978
+
+### Health Check
+GET {{host}}/health HTTP/1.1
+
+### Recommend (Basic)
+GET {{host}}/recommend?interests=ai,agents&top=3 HTTP/1.1
+
+### Recommend (Detailed)
+GET {{host}}/recommend?interests=ai,agents,production&top=5&min_score=0.3 HTTP/1.1
+
+### Recommend with Graph (requires auth)
+# @name recommendGraph
+GET {{host}}/recommend-graph?user_id=user@tenant.com&interests=ai&top=3 HTTP/1.1
+
+### Explain Session
+GET {{host}}/explain?session_id=session-1&interests=ai,agents HTTP/1.1
+
+### Export Itinerary
+POST {{host}}/export HTTP/1.1
+Content-Type: application/json
+
+{
+  "profile": {
+    "interests": ["ai", "agents", "production"]
+  },
+  "format": "markdown"
+}
+
+### Bot Health Check
+GET {{botHost}}/api/health HTTP/1.1
+
+### Get Sessions (Bot API)
+GET {{botHost}}/api/sessions HTTP/1.1
+
+### Bot Recommend
+POST {{botHost}}/api/recommend HTTP/1.1
+Content-Type: application/json
+
+{
+  "interests": ["ai", "agents"],
+  "top": 3
+}
+
+### Telemetry Stats
+GET {{host}}/stats HTTP/1.1
+
+### Prometheus Metrics (if enabled)
+GET {{host}}/metrics HTTP/1.1
+
+###
+### Microsoft Graph API Examples
+###
+
+@graphEndpoint = https://graph.microsoft.com/v1.0
+@accessToken = YOUR_ACCESS_TOKEN_HERE
+
+### Get User Profile
+GET {{graphEndpoint}}/me HTTP/1.1
+Authorization: Bearer {{accessToken}}
+
+### Get User Events
+GET {{graphEndpoint}}/me/events?$select=subject,start,end&$top=10 HTTP/1.1
+Authorization: Bearer {{accessToken}}
+
+### Get Calendar View
+GET {{graphEndpoint}}/me/calendarView?startDateTime=2024-01-01T00:00:00Z&endDateTime=2024-12-31T23:59:59Z HTTP/1.1
+Authorization: Bearer {{accessToken}}
+
+###
+### Azure Deployment Health Checks
+###
+
+@azureHost = https://eventkit-dev.azurewebsites.net
+
+### Azure Health Check
+GET {{azureHost}}/health HTTP/1.1
+
+### Azure Recommend
+GET {{azureHost}}/recommend?interests=ai&top=3 HTTP/1.1

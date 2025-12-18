@@ -1,10 +1,13 @@
 """Bot Framework adapter for Event Kit to support Direct Line / Web Chat.
 
+NOTE: This module now uses the unified BotAdapter from adapters.bot_adapter.
+Maintained for backward compatibility.
+
 Run with:
   AGENT_API_BASE=http://localhost:8010 python -m eventkit.adapters.directline_bot --port 3979 --app-id <APP_ID> --app-password <APP_PASSWORD>
 
-This creates a Bot Framework endpoint at /api/messages that forwards user text
-to the Event Kit recommend endpoint and returns an Adaptive Card attachment.
+This creates a Bot Framework endpoint at /api/messages that uses the unified
+Bot Framework adapter with Adaptive Card support.
 """
 
 from __future__ import annotations
@@ -24,13 +27,50 @@ from botbuilder.core import (
 )
 from botbuilder.schema import Activity, ActivityTypes, Attachment
 
+# Import unified bot adapter
+try:
+    import sys
+    from pathlib import Path
+    # Add parent directory to path for imports
+    sys.path.insert(0, str(Path(__file__).parent.parent))
+    from adapters.bot_adapter import BotAdapter
+    HAS_UNIFIED_ADAPTER = True
+except ImportError:
+    HAS_UNIFIED_ADAPTER = False
+
 
 class AgentBridgeBot(ActivityHandler):
+    """
+    Bot Framework bridge for EventKit.
+
+    Now uses unified BotAdapter when available.
+    """
+
     def __init__(self, agent_base: str) -> None:
         super().__init__()
         self.agent_base = agent_base.rstrip("/")
 
+        # Try to use unified adapter
+        if HAS_UNIFIED_ADAPTER:
+            try:
+                self.unified_adapter = BotAdapter()
+            except Exception as e:
+                print(f"Warning: Could not initialize unified adapter: {e}")
+                self.unified_adapter = None
+        else:
+            self.unified_adapter = None
+
     async def on_message_activity(self, turn_context: TurnContext):
+        """Handle message activity using unified adapter if available."""
+        # Use unified adapter if available
+        if self.unified_adapter:
+            try:
+                await self.unified_adapter.handle_activity(turn_context)
+                return
+            except Exception as e:
+                print(f"Warning: Unified adapter failed, falling back to HTTP: {e}")
+
+        # Fallback to HTTP-based approach
         user_text = (turn_context.activity.text or "").strip()
         if not user_text:
             await turn_context.send_activity(
@@ -58,6 +98,7 @@ class AgentBridgeBot(ActivityHandler):
     async def _fetch_recommendations(
         self, interests: str
     ) -> tuple[Optional[Dict[str, Any]], str]:
+        """Fetch recommendations from HTTP API (fallback)."""
         url = f"{self.agent_base}/recommend?interests={aiohttp.helpers.quote(interests)}&top=3&card=1"
         async with aiohttp.ClientSession() as session:
             async with session.get(url) as resp:

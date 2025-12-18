@@ -1,0 +1,56 @@
+$schema: https://azuremlschemas.azureedge.net/promptflow/latest/Flow.schema.json
+environment:
+  python_requirements_txt: requirements.txt
+
+inputs:
+  expected_sessions:
+    type: list
+    description: Expected session recommendations
+  actual_sessions:
+    type: list
+    description: Actual session recommendations from the agent
+  interests:
+    type: string
+    description: User interests for the query
+
+outputs:
+  precision:
+    type: number
+    reference: ${calculate_metrics.output.precision}
+  recall:
+    type: number
+    reference: ${calculate_metrics.output.recall}
+  f1_score:
+    type: number
+    reference: ${calculate_metrics.output.f1_score}
+  relevance_score:
+    type: number
+    reference: ${check_relevance.output.score}
+
+nodes:
+  - name: calculate_metrics
+    type: python
+    source:
+      type: code
+      path: flows/evaluation/calculate_metrics.py
+    inputs:
+      expected_sessions: ${inputs.expected_sessions}
+      actual_sessions: ${inputs.actual_sessions}
+    outputs:
+      precision: number
+      recall: number
+      f1_score: number
+  
+  - name: check_relevance
+    type: llm
+    source:
+      type: code
+      path: flows/evaluation/check_relevance.jinja2
+    inputs:
+      deployment_name: gpt-4o
+      temperature: 0.3
+      max_tokens: 500
+      sessions: ${inputs.actual_sessions}
+      interests: ${inputs.interests}
+    connection: azure_openai_connection
+    api: chat

@@ -1,0 +1,83 @@
+$schema: https://azuremlschemas.azureedge.net/promptflow/latest/Flow.schema.json
+environment:
+  python_requirements_txt: requirements.txt
+
+inputs:
+  user_message:
+    type: string
+    description: User's question or request
+  interests:
+    type: string
+    default: ""
+    description: User's interests (optional, comma-separated)
+  conversation_history:
+    type: list
+    default: []
+    description: Previous conversation messages
+
+outputs:
+  response:
+    type: string
+    reference: ${generate_response.output}
+  sessions:
+    type: object
+    reference: ${get_recommendations.output}
+
+nodes:
+  - name: parse_intent
+    type: python
+    source:
+      type: code
+      path: flows/parse_intent.py
+    inputs:
+      user_message: ${inputs.user_message}
+    outputs:
+      intent: string
+      extracted_interests: string
+      session_title: string
+  
+  - name: get_recommendations
+    type: python
+    source:
+      type: code
+      path: flows/get_recommendations.py
+    inputs:
+      interests: ${parse_intent.output.extracted_interests}
+      user_interests: ${inputs.interests}
+    outputs:
+      recommendations: object
+    activate:
+      when: ${parse_intent.output.intent}
+      is: recommend
+  
+  - name: explain_session
+    type: python
+    source:
+      type: code
+      path: flows/explain_session.py
+    inputs:
+      session_title: ${parse_intent.output.session_title}
+      interests: ${parse_intent.output.extracted_interests}
+    outputs:
+      explanation: string
+    activate:
+      when: ${parse_intent.output.intent}
+      is: explain
+  
+  - name: generate_response
+    type: llm
+    source:
+      type: code
+      path: flows/generate_response.jinja2
+    inputs:
+      deployment_name: gpt-4o
+      temperature: 0.7
+      top_p: 1.0
+      max_tokens: 1000
+      user_message: ${inputs.user_message}
+      intent: ${parse_intent.output.intent}
+      recommendations: ${get_recommendations.output.recommendations}
+      explanation: ${explain_session.output.explanation}
+      conversation_history: ${inputs.conversation_history}
+    connection: azure_openai_connection
+    api: chat

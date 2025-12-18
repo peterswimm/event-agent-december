@@ -31,16 +31,22 @@ Event Kit now supports hosting via Microsoft 365 Agents SDK and Bot Framework, e
 
 | Component | File | Purpose |
 |-----------|------|---------|
-| Agent Adapter | `agents_sdk_adapter.py` | Bridges EventKit core to Agents SDK |
+| Unified Adapters | `adapters/` | Flexible integration framework for multiple platforms |
+| - Base Adapter | `adapters/base_adapter.py` | Abstract base with shared tool registration and error handling |
+| - Foundry Adapter | `adapters/foundry_adapter.py` | Azure AI Foundry and Agent Framework integration |
+| - Bot Adapter | `adapters/bot_adapter.py` | Bot Framework, Teams, and Adaptive Card generation |
+| Legacy Adapter | `agent_framework_adapter.py` | Backward compatibility wrapper (uses FoundryAdapter) |
 | Bot Handler | `bot_handler.py` | Teams Bot Framework activity processing |
 | Manifest | `agent-declaration.json` | Agent capabilities definition |
 | Teams Manifest | `teams-app.json` | Teams bot registration |
+
+> **Note**: The unified adapter architecture (see [UNIFIED_ADAPTER_ARCHITECTURE.md](UNIFIED_ADAPTER_ARCHITECTURE.md)) provides a consistent pattern for integrating with Azure AI Foundry, Power Platform, and Bot Framework while reducing code duplication by 24%.
 
 ---
 
 ## Architecture
 
-```
+```mermaid
 ┌─────────────────────┐
 │   Teams/Outlook     │
 │   Copilot Studio    │
@@ -52,8 +58,11 @@ Event Kit now supports hosting via Microsoft 365 Agents SDK and Bot Framework, e
 └──────────┬──────────┘
            │ Tool Calls
 ┌──────────▼──────────────────────┐
-│   EventKitAgent Adapter          │
-│   (agents_sdk_adapter.py)        │
+│   Unified Adapters Framework     │
+│   (adapters/base_adapter.py)     │
+│   ├─ foundry_adapter.py          │
+│   ├─ bot_adapter.py               │
+│   └─ power_adapter.py            │
 └──────────┬──────────────────────┘
            │ Functions
 ┌──────────▼────────────────────────────┐
@@ -224,9 +233,9 @@ async def messages(req: web.Request) -> web.Response:
     """Handle incoming Bot Framework activities."""
     body = await req.json()
     auth_header = req.headers.get("Authorization", "")
-    
+
     response = await adapter.process_activity(auth_header, body, bot.on_turn)
-    
+
     if response:
         return web.json_response(data=response.body)
     else:
@@ -236,13 +245,13 @@ async def messages(req: web.Request) -> web.Response:
 async def create_app():
     """Create and configure aiohttp application."""
     global adapter
-    
+
     # Create adapter
     auth = ConfigurationBotFrameworkAuthentication()
     adapter = CloudAdapter(auth)
-    
+
     app = web.Application()
-    
+
     # Add error handling
     async def handle_error(request, error):
         logger.exception(f"Request failed: {error}")
@@ -250,22 +259,22 @@ async def create_app():
             {"error": "Internal server error"},
             status=500
         )
-    
+
     app.middlewares.append(handle_error)
-    
+
     # Routes
     app.router.add_post("/api/messages", messages)
     app.router.add_get("/health", lambda r: web.json_response({"status": "ok"}))
-    
+
     return app
 
 
 if __name__ == "__main__":
     PORT = int(os.getenv("PORT", "3978"))
-    
+
     loop = asyncio.get_event_loop()
     app = loop.run_until_complete(create_app())
-    
+
     web.run_app(app, host="0.0.0.0", port=PORT)
 ```
 
@@ -660,11 +669,11 @@ handler = EventKitBotHandler()
 async def process_user_message(text):
     # Parse and handle
     command, params = handler._parse_message(text)
-    
+
     if command == "recommend":
         # Get recommendations
         result = handler.agent.handle_tool_call(
-            "recommend_sessions", 
+            "recommend_sessions",
             params
         )
         return result["markdown"]
@@ -684,6 +693,6 @@ async def process_user_message(text):
 
 ## Support
 
-**Issues**: [GitHub Issues](https://github.com/peterswimm/event-agent-december/issues)  
-**Documentation**: [Complete Docs](https://github.com/peterswimm/event-agent-december/tree/main/docs)  
+**Issues**: [GitHub Issues](https://github.com/peterswimm/event-agent-december/issues)
+**Documentation**: [Complete Docs](https://github.com/peterswimm/event-agent-december/tree/main/docs)
 **Teams Samples**: [Microsoft Teams Samples](https://github.com/OfficeDev/Microsoft-Teams-Samples)

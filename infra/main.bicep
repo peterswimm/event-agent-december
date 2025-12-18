@@ -36,6 +36,12 @@ param graphUserId string = ''
 @secure()
 param apiToken string = ''
 
+@description('Deploy Microsoft Foundry resources (AI Hub and Project)')
+param deployFoundry bool = false
+
+@description('Azure OpenAI resource name (if using Azure OpenAI)')
+param openAIResourceName string = ''
+
 // Variables
 var appName = 'eventkit-${environment}-${resourceSuffix}'
 var appServicePlanName = 'asp-${appName}'
@@ -244,9 +250,91 @@ resource storageAccessPolicy 'Microsoft.Authorization/roleAssignments@2022-04-01
   }
 }
 
+// ==================== Microsoft Foundry Resources ====================
+
+// AI Services (Cognitive Services multi-service account)
+resource aiServices 'Microsoft.CognitiveServices/accounts@2023-10-01-preview' = if (deployFoundry) {
+  name: '${appName}-aiservices'
+  location: location
+  kind: 'AIServices'
+  sku: {
+    name: 'S0'
+  }
+  properties: {
+    customSubDomainName: '${appName}-aiservices'
+    publicNetworkAccess: 'Enabled'
+    networkAcls: {
+      defaultAction: 'Allow'
+    }
+  }
+}
+
+// Azure OpenAI (optional)
+resource openAI 'Microsoft.CognitiveServices/accounts@2023-10-01-preview' = if (deployFoundry && !empty(openAIResourceName)) {
+  name: openAIResourceName
+  location: location
+  kind: 'OpenAI'
+  sku: {
+    name: 'S0'
+  }
+  properties: {
+    customSubDomainName: openAIResourceName
+    publicNetworkAccess: 'Enabled'
+  }
+}
+
+// Azure AI Hub
+resource aiHub 'Microsoft.MachineLearningServices/workspaces@2024-04-01' = if (deployFoundry) {
+  name: '${appName}-hub'
+  location: location
+  identity: {
+    type: 'SystemAssigned'
+  }
+  sku: {
+    name: 'Basic'
+    tier: 'Basic'
+  }
+  kind: 'Hub'
+  properties: {
+    friendlyName: 'EventKit AI Hub - ${environment}'
+    description: 'Azure AI Hub for EventKit agent development'
+    storageAccount: storageAccount.id
+    keyVault: keyVault.id
+    applicationInsights: appInsights.id
+    publicNetworkAccess: 'Enabled'
+  }
+}
+
+// Azure AI Project
+resource aiProject 'Microsoft.MachineLearningServices/workspaces@2024-04-01' = if (deployFoundry) {
+  name: '${appName}-project'
+  location: location
+  identity: {
+    type: 'SystemAssigned'
+  }
+  sku: {
+    name: 'Basic'
+    tier: 'Basic'
+  }
+  kind: 'Project'
+  properties: {
+    friendlyName: 'EventKit Project - ${environment}'
+    description: 'Azure AI Project for EventKit agent'
+    hubResourceId: deployFoundry ? aiHub.id : ''
+    publicNetworkAccess: 'Enabled'
+  }
+}
+
 // Outputs
 output appServiceUrl string = 'https://${appService.properties.defaultHostName}'
 output appServiceName string = appService.name
 output appInsightsConnectionString string = appInsights.properties.ConnectionString
 output keyVaultName string = keyVault.name
 output storageAccountName string = storageAccount.name
+
+// Microsoft Foundry Outputs
+output aiHubName string = deployFoundry ? aiHub.name : ''
+output aiProjectName string = deployFoundry ? aiProject.name : ''
+output aiProjectEndpoint string = deployFoundry ? 'https://${location}.api.azureml.ms' : ''
+output aiServicesEndpoint string = deployFoundry ? aiServices.properties.endpoint : ''
+output foundryConnectionString string = deployFoundry ? 'HostName=${location}.api.azureml.ms;SubscriptionId=${subscription().subscriptionId};ResourceGroup=${resourceGroup().name};ProjectName=${aiProject.name}' : ''

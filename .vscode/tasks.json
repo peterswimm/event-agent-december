@@ -1,0 +1,203 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Install Dependencies",
+      "type": "shell",
+      "command": "pip install -e '.[dev]'",
+      "problemMatcher": [],
+      "group": {
+        "kind": "build",
+        "isDefault": false
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "Run Tests",
+      "type": "shell",
+      "command": "pytest tests/ -v --cov=. --cov-report=html --cov-report=term",
+      "problemMatcher": [],
+      "group": {
+        "kind": "test",
+        "isDefault": true
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "Run Tests (Unit Only)",
+      "type": "shell",
+      "command": "pytest tests/ -v -m unit",
+      "problemMatcher": [],
+      "group": "test"
+    },
+    {
+      "label": "Run Tests (Integration Only)",
+      "type": "shell",
+      "command": "pytest tests/ -v -m integration",
+      "problemMatcher": [],
+      "group": "test"
+    },
+    {
+      "label": "Format Code",
+      "type": "shell",
+      "command": "black . && isort .",
+      "problemMatcher": [],
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "silent",
+        "focus": false,
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "Lint Code",
+      "type": "shell",
+      "command": "pylint *.py --max-line-length=100",
+      "problemMatcher": "$pylint",
+      "group": "build"
+    },
+    {
+      "label": "Security Scan",
+      "type": "shell",
+      "command": "bandit -r . -f json -o bandit-report.json",
+      "problemMatcher": [],
+      "group": "build"
+    },
+    {
+      "label": "Start HTTP Server",
+      "type": "shell",
+      "command": "python agent.py serve --port 8010",
+      "problemMatcher": [],
+      "isBackground": true,
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "dedicated"
+      }
+    },
+    {
+      "label": "Start Bot Server",
+      "type": "shell",
+      "command": "python -m adapters.directline_bot",
+      "problemMatcher": [],
+      "isBackground": true,
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "dedicated"
+      }
+    },
+    {
+      "label": "Docker Build",
+      "type": "shell",
+      "command": "docker build -t eventkit:latest -f deploy/Dockerfile .",
+      "problemMatcher": [],
+      "group": "build"
+    },
+    {
+      "label": "Docker Run",
+      "type": "shell",
+      "command": "docker run -p 8010:8010 -p 3978:3978 --env-file .env eventkit:latest",
+      "problemMatcher": [],
+      "dependsOn": "Docker Build",
+      "isBackground": true,
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "dedicated"
+      }
+    },
+    {
+      "label": "Docker Compose Up",
+      "type": "shell",
+      "command": "docker-compose -f deploy/docker-compose.yml up",
+      "problemMatcher": [],
+      "isBackground": true,
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "dedicated"
+      }
+    },
+    {
+      "label": "Generate Coverage Report",
+      "type": "shell",
+      "command": "pytest tests/ --cov=. --cov-report=html && start htmlcov/index.html",
+      "windows": {
+        "command": "pytest tests/ --cov=. --cov-report=html ; Start-Process htmlcov/index.html"
+      },
+      "problemMatcher": [],
+      "group": "test"
+    },
+    {
+      "label": "Export Itinerary",
+      "type": "shell",
+      "command": "python scripts/export_itinerary.py --profile ai,agents --output exports/itinerary.md",
+      "problemMatcher": [],
+      "group": "none"
+    },
+    {
+      "label": "Evaluate Profiles",
+      "type": "shell",
+      "command": "python scripts/evaluate_profiles.py",
+      "problemMatcher": [],
+      "group": "none"
+    },
+    {
+      "label": "Clean Build Artifacts",
+      "type": "shell",
+      "command": "Remove-Item -Recurse -Force __pycache__, .pytest_cache, htmlcov, .coverage, *.egg-info -ErrorAction SilentlyContinue",
+      "windows": {
+        "command": "Remove-Item -Recurse -Force __pycache__, .pytest_cache, htmlcov, .coverage, *.egg-info -ErrorAction SilentlyContinue"
+      },
+      "linux": {
+        "command": "rm -rf __pycache__ .pytest_cache htmlcov .coverage *.egg-info"
+      },
+      "problemMatcher": [],
+      "group": "build"
+    },
+    {
+      "label": "Bicep Deploy (Dev)",
+      "type": "shell",
+      "command": "az deployment group create --resource-group rg-eventkit-dev --template-file infra/main.bicep --parameters infra/dev.bicepparam",
+      "problemMatcher": [],
+      "group": "build"
+    },
+    {
+      "label": "Bicep Validate",
+      "type": "shell",
+      "command": "az bicep build --file infra/main.bicep",
+      "problemMatcher": [],
+      "group": "build"
+    },
+    {
+      "label": "Pre-commit Run All",
+      "type": "shell",
+      "command": "pre-commit run --all-files",
+      "problemMatcher": [],
+      "group": "build"
+    },
+    {
+      "label": "Install Pre-commit Hooks",
+      "type": "shell",
+      "command": "pre-commit install",
+      "problemMatcher": [],
+      "group": "build"
+    }
+  ]
+}

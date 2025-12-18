@@ -1,4 +1,4 @@
-# Event Kit Agent
+ov# Event Kit Agent
 
 **AI-powered event recommendation agent** with multi-channel deployment support. Demonstrates production-ready agent patterns for Teams, Copilot, HTTP APIs, and CLI.
 
@@ -29,9 +29,9 @@ Event Kit is a comprehensive AI agent showcasing enterprise-ready patterns:
 |------|----------|-------------|---------------|
 | **CLI** | Local testing, scripts | `agent.py` | [Quick Start](#quick-start) |
 | **HTTP API** | REST endpoints | `agent.py serve` | [API Docs](docs/api-guide.md) |
-| **Teams Bot** | Microsoft Teams | `bot_server.py` | [Teams Setup](docs/agents-sdk-setup.md) |
-| **Copilot Plugin** | Copilot Studio | `copilot-plugin.json` | [Copilot Guide](docs/agents-sdk-setup.md#copilot-integration) |
-| **Docker** | Containerized deployment | `deploy/Dockerfile` | [Deployment Guide](docs/deployment-guide.md) |
+| **Teams Bot** | Microsoft Teams | `bot_server.py` | [Teams Setup](docs/agents-sdk-setup.md) · [MS Learn: Bot Framework](https://learn.microsoft.com/azure/bot-service/) |
+| **Copilot Plugin** | Copilot Studio | `copilot-plugin.json` | [Copilot Guide](docs/agents-sdk-setup.md#copilot-integration) · [MS Learn: Copilot Studio](https://learn.microsoft.com/microsoft-copilot-studio/) |
+| **Docker** | Containerized deployment | `deploy/Dockerfile` | [Deployment Guide](docs/deployment-guide.md) · [MS Learn: Container Apps](https://learn.microsoft.com/azure/container-apps/) |
 
 ---
 
@@ -112,32 +112,61 @@ cd deploy
 docker compose up
 ```
 
+### 5️⃣ Microsoft Foundry Mode (15 minutes)
+
+```bash
+# Deploy infrastructure with Foundry
+az deployment group create \
+  --resource-group eventkit-rg \
+  --template-file infra/main.bicep \
+  --parameters deployFoundry=true
+
+# Install Agent Framework SDK (--pre flag required)
+pip install agent-framework-azure-ai --pre
+
+# Configure environment
+export FOUNDRY_ENABLED=true
+export FOUNDRY_PROJECT_ENDPOINT="https://eastus.api.azureml.ms"
+
+# Run with Agent Framework
+python agent_framework_adapter.py
+```
+
+**Complete guide**: [docs/foundry-deployment.md](docs/foundry-deployment.md)
+
+**Microsoft Learn**:
+- [Azure AI Foundry Overview](https://learn.microsoft.com/azure/ai-studio/what-is-ai-studio)
+- [Agent Service](https://learn.microsoft.com/azure/ai-services/agents/overview)
+- [Prompt Flow](https://learn.microsoft.com/azure/machine-learning/prompt-flow/overview-what-is-prompt-flow)
+
 ---
 
-## 📚 Documentation Hub
+## 📚 Documentation
 
-### Getting Started
-- 🚀 **[Quick Start](docs/01-GETTING-STARTED/quick-start.md)** - 5-minute setup
-- 📦 **[Installation Guide](docs/01-GETTING-STARTED/installation.md)** - Detailed setup
-- 🧪 **[Local Testing Guide](LOCAL_TESTING.md)** - Test all channels locally
-- 📖 **[Teams Quick Reference](TEAMS_QUICK_REFERENCE.md)** - Bot commands & usage
+### Quick Start
 
-### Integration Guides
-- 🤖 **[Teams/Copilot Setup](docs/agents-sdk-setup.md)** - Bot Framework integration (650+ lines)
-- 📅 **[Graph API Setup](docs/03-GRAPH-API/setup.md)** - Calendar integration
-- 🚀 **[Deployment Guide](docs/deployment-guide.md)** - Production deployment (500+ lines)
-- 🔧 **[API Documentation](docs/api-guide.md)** - HTTP endpoints with 100+ examples
+- 🚀 **[QUICKSTART.md](QUICKSTART.md)** - Get started in 5 minutes
+- 💻 **[DEVELOPMENT.md](DEVELOPMENT.md)** - Development setup & workflow
+- 🧪 **[LOCAL_TESTING.md](LOCAL_TESTING.md)** - Multi-channel testing guide
 
-### Development
-- 💻 **[Development Guide](DEVELOPMENT.md)** - Local development setup
-- 🏗️ **[Architecture Guide](docs/04-ARCHITECTURE/design.md)** - System design
-- 🐛 **[Troubleshooting](docs/troubleshooting.md)** - Common issues & solutions
-- ✅ **[Testing Guide](docs/06-DEVELOPMENT/testing.md)** - Test strategy
+### Architecture
 
-### Project Status
-- 📊 **[Phase 3 Completion](PHASE3_COMPLETION.md)** - What was built (400+ lines)
-- 🗺️ **[Roadmap](ROADMAP.md)** - Implementation progress
-- 📋 **[Work Summary](WORK_COMPLETED.md)** - Executive summary
+- ⭐ **[docs/UNIFIED_ADAPTER_ARCHITECTURE.md](docs/UNIFIED_ADAPTER_ARCHITECTURE.md)** - Unified adapter pattern (Azure AI Foundry, Power Platform, Bot Framework)
+- 🔧 **[docs/EXTENSIBILITY_GUIDE.md](docs/EXTENSIBILITY_GUIDE.md)** - Extending with Power Platform, Azure Functions, declarative agents
+
+### Integration & Deployment
+
+- 🤖 **[docs/agents-sdk-setup.md](docs/agents-sdk-setup.md)** - Teams/Copilot integration · [MS Learn](https://learn.microsoft.com/azure/bot-service/bot-builder-basics)
+- 🏭 **[docs/foundry-deployment.md](docs/foundry-deployment.md)** - Azure AI Foundry deployment · [MS Learn](https://learn.microsoft.com/azure/ai-studio/)
+- 🚀 **[docs/deployment-guide.md](docs/deployment-guide.md)** - Production deployment · [MS Learn](https://learn.microsoft.com/azure/app-service/)
+- 🔄 **[docs/AGENTS_M365_COPILOT_MIGRATION.md](docs/AGENTS_M365_COPILOT_MIGRATION.md)** - Microsoft SDK migration guide
+
+### API & Testing
+
+- 🔧 **[docs/api-guide.md](docs/api-guide.md)** - HTTP API reference
+- 📝 **[docs/api-examples.md](docs/api-examples.md)** - API usage examples
+- ✅ **[docs/TESTING_GUIDE.md](docs/TESTING_GUIDE.md)** - Comprehensive testing guide (190+ tests)
+- 🐛 **[docs/troubleshooting.md](docs/troubleshooting.md)** - Troubleshooting & common issues
 
 ---
 
@@ -317,6 +346,195 @@ az deployment group create \
 
 ---
 
+### Environment 8: Microsoft Foundry
+**Purpose**: AI Hub orchestration, Prompt Flow evaluation, model management
+
+**Setup**:
+```bash
+# Deploy Foundry infrastructure
+az deployment group create \
+  --resource-group eventkit-foundry-rg \
+  --template-file infra/main.bicep \
+  --parameters deployFoundry=true
+
+# Install Agent Framework SDK (--pre flag required)
+pip install agent-framework-azure-ai --pre
+
+# Configure environment
+export FOUNDRY_ENABLED=true
+export FOUNDRY_PROJECT_ENDPOINT="https://eastus.api.azureml.ms"
+export FOUNDRY_PROJECT_NAME="eventkit-prod-project"
+```
+
+**Test**:
+```python
+from agent_framework_adapter import EventKitAgentFramework
+agent = EventKitAgentFramework()
+response = await agent.run("recommend sessions about AI agents")
+```
+
+**Features**:
+- ✅ AI Hub & Project for resource management
+- ✅ GPT-4o and GPT-3.5-turbo deployments
+- ✅ Prompt Flow orchestration (4-node workflow)
+- ✅ Evaluation framework (precision, recall, F1, relevance)
+- ✅ Managed compute and auto-scaling
+- ✅ Enterprise security (RBAC, Key Vault)
+
+**Best for**: Production AI orchestration, model evaluation, multi-agent systems, prompt engineering
+
+**Complete guide**: [docs/foundry-deployment.md](docs/foundry-deployment.md)
+
+---
+
+## ⚖️ Choosing the Right Platform
+
+**Microsoft Foundry or Copilot Studio?** Here's how to decide:
+
+### Decision Framework
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                  WHO IS BUILDING?                            │
+└─────────────────────────────────────────────────────────────┘
+                           │
+          ┌────────────────┴────────────────┐
+          │                                 │
+   ┌──────▼──────┐                   ┌─────▼─────┐
+   │ Line-of-    │                   │ Software  │
+   │ Business    │                   │ Developers│
+   │ Users + IT  │                   │ with      │
+   │ Admins      │                   │ DevOps    │
+   └──────┬──────┘                   └─────┬─────┘
+          │                                 │
+   ┌──────▼──────────────┐          ┌──────▼──────────────┐
+   │ COPILOT STUDIO      │          │ MICROSOFT FOUNDRY   │
+   │                     │          │                     │
+   │ ✅ Low-code UI      │          │ ✅ Full Python/C#   │
+   │ ✅ Managed platform │          │ ✅ Custom code      │
+   │ ✅ Quick iteration  │          │ ✅ DevOps pipelines │
+   │ ✅ Built-in actions │          │ ✅ Own resources    │
+   │ ✅ No infra mgmt    │          │ ✅ Deep integration │
+   └─────────────────────┘          └─────────────────────┘
+```
+
+### When to Use Copilot Studio
+
+**✅ Choose Copilot Studio when**:
+- **Team composition**: Line-of-business users, IT admins, professional makers
+- **Development style**: Low-code, visual design, managed environment
+- **Speed**: Need to move from experimentation to execution quickly
+- **Complexity**: Moderate workflows with built-in connectors
+- **Governance**: Want managed security, compliance out-of-the-box
+
+**Example scenarios**:
+- HR building an employee onboarding agent
+- IT help desk creating a ticket routing bot
+- Marketing automating customer engagement
+- Rapid prototyping with business stakeholders
+
+**EventKit in Copilot Studio**:
+- Use `copilot-plugin.json` manifest
+- Deploy via [docs/agents-sdk-setup.md](docs/agents-sdk-setup.md#copilot-integration)
+- Leverage built-in Teams integration
+- No infrastructure management required
+
+**Learn more**:
+- [Microsoft Copilot Studio documentation](https://learn.microsoft.com/microsoft-copilot-studio/)
+- [Create your first copilot](https://learn.microsoft.com/microsoft-copilot-studio/fundamentals-get-started)
+- [Add custom actions](https://learn.microsoft.com/microsoft-copilot-studio/advanced-plugin-actions)
+
+---
+
+### When to Use Microsoft Foundry
+
+**✅ Choose Microsoft Foundry when**:
+- **Team composition**: Software developers, ML engineers, DevOps teams
+- **Development style**: Pro-code, Python/C#/.NET, custom frameworks
+- **Control**: Need deep customization, custom models, fine-tuning
+- **Integration**: Complex enterprise systems, custom APIs
+- **DevOps**: CI/CD pipelines, infrastructure as code, version control
+
+**Example scenarios**:
+- Building multi-agent orchestration systems
+- Custom model deployment and evaluation
+- Complex RAG (Retrieval-Augmented Generation) pipelines
+- Production ML workflows with advanced monitoring
+- Integration with legacy enterprise systems
+
+**EventKit in Microsoft Foundry**:
+- Use `agent_framework_adapter.py` for Agent Framework
+- Deploy with `flow.dag.yaml` for Prompt Flow orchestration
+- Full guide: [docs/foundry-deployment.md](docs/foundry-deployment.md)
+- Bicep infrastructure: `infra/main.bicep` with `deployFoundry=true`
+
+**Learn more**:
+- [Azure AI Foundry documentation](https://learn.microsoft.com/azure/ai-studio/)
+- [Develop AI agents](https://learn.microsoft.com/azure/ai-services/agents/quickstart)
+- [Prompt Flow development](https://learn.microsoft.com/azure/machine-learning/prompt-flow/get-started-prompt-flow)
+- [Deploy generative AI](https://learn.microsoft.com/azure/machine-learning/prompt-flow/how-to-deploy-for-real-time-inference)
+
+---
+
+### Fusion Teams: Use Both
+
+**Many organizations need both platforms** - this is expected and supported:
+
+**Collaboration patterns**:
+- **Copilot Studio agents** for business users
+- **Foundry agents** for backend processing, ML models
+- **Communication**: Multi-agent workflows using MCP, A2A, Activity Protocol
+
+**Microsoft Agent Pre-Purchase Plan (P3)**:
+- Single pool of funds for both platforms
+- Choose the right tool at build time, not purchase time
+- Flexibility as team composition changes
+
+**EventKit supports both**:
+- Bot Framework for Copilot Studio integration
+- Agent Framework for Foundry orchestration
+- Shared core logic (`core.py`) works across platforms
+
+---
+
+### Feature Parity Reference
+
+| Feature | Copilot Studio | Microsoft Foundry | EventKit Support |
+|---------|----------------|-------------------|------------------|
+| **Multi-agent workflows** | ✅ | ✅ | ✅ Both |
+| **Tools/Plugins** | ✅ Built-in | ✅ Custom | ✅ Both |
+| **Orchestration** | ✅ Visual | ✅ Code-first | ✅ Both |
+| **Enterprise governance** | ✅ Managed | ✅ Custom RBAC | ✅ Both |
+| **Low-code design** | ✅ Yes | ❌ Pro-code only | ⚠️ Copilot only |
+| **Custom models** | ⚠️ Limited | ✅ Full control | ✅ Foundry |
+| **DevOps integration** | ⚠️ Basic | ✅ Advanced | ✅ Foundry |
+| **Infrastructure control** | ❌ Managed | ✅ Full control | ✅ Foundry |
+
+### Decision Checklist
+
+**Choose Copilot Studio if you answer YES to 3+ questions**:
+- [ ] Do you have non-developer business users building agents?
+- [ ] Do you prefer visual/low-code tools?
+- [ ] Is speed to market more important than deep customization?
+- [ ] Do you want Microsoft to manage infrastructure?
+- [ ] Are built-in connectors sufficient for your needs?
+
+**Choose Microsoft Foundry if you answer YES to 3+ questions**:
+- [ ] Do you have professional software developers on the team?
+- [ ] Do you need custom model deployment or fine-tuning?
+- [ ] Do you require advanced DevOps (CI/CD, IaC, testing)?
+- [ ] Do you need deep integration with custom enterprise systems?
+- [ ] Do you want full control over infrastructure and resources?
+
+**Need help deciding?** Contact: Mads Bolaris, Shawn Henry, Anjli Chaudhry
+
+**Official Resources**:
+- [Microsoft Agent Service documentation](https://learn.microsoft.com/azure/ai-services/agents/)
+- [Build your first agent](https://learn.microsoft.com/azure/ai-services/agents/quickstart)
+- [Azure AI platform decision guide](https://learn.microsoft.com/azure/architecture/data-guide/technology-choices/data-science-and-machine-learning)
+
+---
+
 ## 🎯 API Overview
 
 ### HTTP Endpoints
@@ -382,28 +600,33 @@ az deployment group create \
 |-----------|------|---------|-------|
 | **Core Logic** | `core.py` | Recommendation engine | ~400 |
 | **Agent CLI** | `agent.py` | Command-line interface | ~800 |
-| **Bot Handler** | `bot_handler.py` | Teams message processing | 539 |
+| **Bot Handler** | `bot_handler.py` | Teams message processing | 455 |
 | **Bot Server** | `bot_server.py` | aiohttp HTTP server | 223 |
-| **SDK Adapter** | `agents_sdk_adapter.py` | Agents SDK integration | 539 |
+| **Unified Adapters** | `adapters/base_adapter.py` | Base adapter framework | 450 |
+| **Foundry Adapter** | `adapters/foundry_adapter.py` | Azure AI Foundry | 150 |
+| **Power Adapter** | `adapters/power_adapter.py` | Power Platform | 120 |
+| **Bot Adapter** | `adapters/bot_adapter.py` | Bot Framework | 150 |
 | **Graph Service** | `graph_service.py` | Microsoft Graph API | ~300 |
 | **Telemetry** | `telemetry.py` | Application Insights | ~200 |
 | **Settings** | `settings.py` | Configuration management | ~150 |
 
+**Architecture**: EventKit uses a **unified adapter pattern** to integrate with Azure AI Foundry, Power Platform, and Bot Framework. See [docs/UNIFIED_ADAPTER_ARCHITECTURE.md](docs/UNIFIED_ADAPTER_ARCHITECTURE.md) for details.
+
 ### Feature Matrix
 
-| Feature | CLI | HTTP API | Bot Emulator | Teams | Copilot | Production |
-|---------|-----|----------|--------------|-------|---------|------------|
-| **Recommendations** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| **Explanations** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| **Export Itinerary** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| **Adaptive Cards** | ❌ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| **Graph Integration** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| **Profile Persistence** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| **Natural Language** | ❌ | ❌ | ✅ | ✅ | ✅ | ✅ |
-| **Rate Limiting** | ❌ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| **Telemetry** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| **Authentication** | ❌ | ❌ | ❌ | ✅ | ✅ | ✅ |
-| **Monitoring** | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
+| Feature | CLI | HTTP API | Bot Emulator | Teams | Foundry | Copilot | Production |
+|---------|-----|----------|--------------|-------|---------|---------|------------|
+| **Recommendations** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **Explanations** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **Export Itinerary** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **Adaptive Cards** | ❌ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **Graph Integration** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **Profile Persistence** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **Natural Language** | ❌ | ❌ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **Rate Limiting** | ❌ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **Telemetry** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **Authentication** | ❌ | ❌ | ❌ | ✅ | ✅ | ✅ | ✅ |
+| **Monitoring** | ❌ | ❌ | ❌ | ❌ | ✅ | ❌ | ✅ |
 
 ---
 
@@ -527,6 +750,8 @@ pre-commit run --all-files
 ---
 
 ## Docker & Azure Deployment
+
+**Microsoft Learn**: [Azure Container Apps](https://learn.microsoft.com/azure/container-apps/) · [Deploy containers](https://learn.microsoft.com/azure/container-apps/quickstart-portal)
 
 **Local Docker**:
 
@@ -658,17 +883,28 @@ event-agent-example/
 │   ├── agent-declaration.json        # Agents SDK manifest
 │   └── agent.schema.json             # JSON schema validation
 │
-├── 🤖 Bot Framework Integration (NEW)
-│   ├── bot_handler.py                # Teams activity handler (539 lines)
+├── 🔌 Unified Adapters (NEW)
+│   ├── adapters/
+│   │   ├── __init__.py               # Package initialization
+│   │   ├── base_adapter.py           # Base adapter framework (450 lines)
+│   │   ├── foundry_adapter.py        # Azure AI Foundry (150 lines)
+│   │   ├── power_adapter.py          # Power Platform (120 lines)
+│   │   ├── bot_adapter.py            # Bot Framework (150 lines)
+│   │   ├── directline_bot.py         # Direct Line bridge
+│   │   └── requirements-directline.txt
+│   ├── agent_framework_adapter.py    # Backward compat wrapper
+│   └── agents_sdk_adapter.py         # Legacy adapter (539 lines)
+│
+├── 🤖 Bot Framework Integration
+│   ├── bot_handler.py                # Teams activity handler (455 lines)
 │   ├── bot_server.py                 # aiohttp HTTP server (223 lines)
-│   ├── agents_sdk_adapter.py         # Agents SDK adapter (539 lines)
 │   ├── teams-app.json                # Teams app manifest
 │   └── copilot-plugin.json           # Copilot Studio plugin manifest
 │
 ├── 🌐 Microsoft Graph Integration
 │   ├── graph_service.py              # Calendar API client
 │   ├── graph_auth.py                 # MSAL authentication
-│   └── runner.py                     # Multi-mode runner (CLI, HTTP, Bot, m365-agent)
+│   └── runner.py                     # Multi-mode runner
 │
 ├── ⚙️ Configuration & Utilities
 │   ├── settings.py                   # Pydantic settings + environment config
@@ -676,23 +912,25 @@ event-agent-example/
 │   ├── logging_config.py             # Structured logging
 │   └── errors.py                     # Custom exceptions
 │
-├── 🧪 Tests (147 tests passing)
+├── 🧪 Tests (190+ tests passing)
+│   ├── test_unified_adapters.py      # Unified adapter tests (NEW)
 │   ├── test_agents_sdk.py            # SDK adapter tests
 │   ├── test_graph_service.py         # Graph API tests
 │   ├── test_core_graph.py            # Core logic tests
-│   ├── test_recommend.py             # Recommendation tests
-│   ├── test_security.py              # Security scanning tests
-│   └── ... (15+ test files)
+│   ├── test_bot_handler.py           # Bot Framework tests
+│   └── ... (20 test files)
 │
 ├── 📚 Documentation
 │   ├── README.md                     # This file
 │   ├── QUICKSTART.md                 # Quick start guide
-│   ├── LOCAL_TESTING.md              # Multi-channel testing guide (NEW)
-│   ├── TEAMS_QUICK_REFERENCE.md      # Teams bot commands (NEW)
-│   ├── PHASE3_COMPLETION.md          # Implementation status (NEW)
-│   ├── PHASE3_INDEX.md               # Documentation index (NEW)
+│   ├── DEVELOPMENT.md                # Development guide
+│   ├── LOCAL_TESTING.md              # Multi-channel testing guide
 │   ├── docs/
-│   │   ├── agents-sdk-setup.md       # Teams/Copilot integration (650+ lines)
+│   │   ├── UNIFIED_ADAPTER_ARCHITECTURE.md  # Unified adapters (NEW)
+│   │   ├── EXTENSIBILITY_GUIDE.md    # Power Platform integration
+│   │   ├── AGENTS_M365_COPILOT_MIGRATION.md # Microsoft SDK migration
+│   │   ├── TESTING_GUIDE.md          # Comprehensive testing
+│   │   ├── agents-sdk-setup.md       # Teams/Copilot integration
 │   │   ├── deployment-guide.md       # Production deployment (500+ lines)
 │   │   ├── api-guide.md              # HTTP API reference
 │   │   ├── technical-guide.md        # Architecture deep dive
@@ -870,13 +1108,107 @@ Adjust behavior in `agent.json > features`:
 
 ---
 
-## Resources
+## Resources & Dependencies
 
-- **Vibe Kit Repository**: <https://github.com/peterswimm/vibe-kit>
-- **Agent SDK Starter**: `innovation-kit-repository/event-agent/starter-code/agents_sdk_integration/`
-- **Full Setup Guide**: `innovation-kit-repository/event-agent/MVP_GUIDE.md`
-- **Roadmap**: `innovation-kit-repository/event-agent/ROADMAP.md`
-- **Technical Docs**: `eventkit/docs/technical-guide.md`
+**Core Dependencies**:
+- **[Bot Framework SDK](https://learn.microsoft.com/azure/bot-service/)** - Teams/Outlook bot integration
+- **[Microsoft Graph](https://learn.microsoft.com/graph/)** - Calendar and M365 data access
+- **[Application Insights](https://learn.microsoft.com/azure/azure-monitor/app/app-insights-overview)** - Telemetry and monitoring
+- **[Azure Bicep](https://learn.microsoft.com/azure/azure-resource-manager/bicep/)** - Infrastructure as Code
+- **[pytest](https://docs.pytest.org/)** - Testing framework
+- **[VS Code](https://code.visualstudio.com/docs/languages/python)** - Python development environment
+
+---
+
+## 📚 Additional Resources
+
+### EventKit Documentation
+
+**Getting Started**:
+- **[QUICKSTART.md](QUICKSTART.md)** - Quick start guide (5 minutes)
+- **[DEVELOPMENT.md](DEVELOPMENT.md)** - Development guide
+- **[LOCAL_TESTING.md](LOCAL_TESTING.md)** - Multi-channel testing guide
+
+**Architecture & Integration**:
+- **[docs/UNIFIED_ADAPTER_ARCHITECTURE.md](docs/UNIFIED_ADAPTER_ARCHITECTURE.md)** ⭐ - Unified adapter pattern (Azure AI Foundry, Power Platform, Bot Framework)
+- **[docs/EXTENSIBILITY_GUIDE.md](docs/EXTENSIBILITY_GUIDE.md)** - Power Platform, Azure Functions, declarative agents
+- **[docs/AGENTS_M365_COPILOT_MIGRATION.md](docs/AGENTS_M365_COPILOT_MIGRATION.md)** - Microsoft Agents-M365Copilot SDK migration
+
+**Testing & Quality**:
+- **[docs/TESTING_GUIDE.md](docs/TESTING_GUIDE.md)** - Comprehensive testing guide (20 test files, 190+ tests)
+- **[pytest.ini](pytest.ini)** - Test configuration
+
+**Complete Documentation**: **[docs/](docs/)** - Full documentation library
+
+### Microsoft Learn Resources
+
+**AI & Agents**:
+- [Azure AI Services overview](https://learn.microsoft.com/azure/ai-services/)
+- [Build AI agents](https://learn.microsoft.com/azure/ai-services/agents/overview)
+- [Azure OpenAI Service](https://learn.microsoft.com/azure/ai-services/openai/)
+- [Responsible AI principles](https://learn.microsoft.com/azure/machine-learning/concept-responsible-ai)
+
+**Bot Framework & Teams**:
+- [Bot Framework documentation](https://learn.microsoft.com/azure/bot-service/)
+- [Teams bot development](https://learn.microsoft.com/microsoftteams/platform/bots/what-are-bots)
+- [Teams Platform overview](https://learn.microsoft.com/microsoftteams/platform/overview)
+- [Teams JavaScript SDK](https://learn.microsoft.com/microsoftteams/platform/tabs/how-to/using-teams-client-sdk)
+- [Adaptive Cards](https://learn.microsoft.com/adaptive-cards/)
+- [Bot Framework SDK (Python)](https://learn.microsoft.com/azure/bot-service/python/bot-builder-python-quickstart)
+
+**Microsoft Graph & SharePoint**:
+- [Microsoft Graph overview](https://learn.microsoft.com/graph/overview)
+- [Graph Python SDK](https://learn.microsoft.com/graph/sdks/sdks-overview)
+- [Calendar API reference](https://learn.microsoft.com/graph/api/resources/calendar)
+- [SharePoint REST API](https://learn.microsoft.com/sharepoint/dev/sp-add-ins/get-to-know-the-sharepoint-rest-service)
+- [SharePoint Framework (SPFx)](https://learn.microsoft.com/sharepoint/dev/spfx/sharepoint-framework-overview)
+- [Files & Lists via Graph](https://learn.microsoft.com/graph/api/resources/sharepoint)
+- [Authentication with MSAL](https://learn.microsoft.com/azure/active-directory/develop/msal-overview)
+
+**Office Add-ins & Extensibility**:
+- [Office Add-ins platform](https://learn.microsoft.com/office/dev/add-ins/overview/office-add-ins)
+- [Office JavaScript API](https://learn.microsoft.com/office/dev/add-ins/reference/javascript-api-for-office)
+- [Outlook Add-ins](https://learn.microsoft.com/office/dev/add-ins/outlook/outlook-add-ins-overview)
+- [Microsoft 365 Copilot extensibility](https://learn.microsoft.com/microsoft-365-copilot/extensibility/)
+
+**Azure Deployment & Functions**:
+- [Azure App Service](https://learn.microsoft.com/azure/app-service/)
+- [Azure Container Apps](https://learn.microsoft.com/azure/container-apps/)
+- [Azure Functions](https://learn.microsoft.com/azure/azure-functions/)
+- [Azure Functions Python](https://learn.microsoft.com/azure/azure-functions/functions-reference-python)
+- [Bicep documentation](https://learn.microsoft.com/azure/azure-resource-manager/bicep/)
+- [Azure CLI reference](https://learn.microsoft.com/cli/azure/)
+
+**Power Platform & Connectors**:
+- [Power Platform overview](https://learn.microsoft.com/power-platform/)
+- [Custom Connectors](https://learn.microsoft.com/connectors/custom-connectors/)
+- [Power Automate](https://learn.microsoft.com/power-automate/)
+- [Power Apps](https://learn.microsoft.com/power-apps/)
+- [Dataverse](https://learn.microsoft.com/power-apps/developer/data-platform/)
+
+**Adaptive Cards & WebChat**:
+- [Adaptive Cards Designer](https://adaptivecards.io/designer/)
+- [Adaptive Cards SDK](https://learn.microsoft.com/adaptive-cards/sdk/)
+- [Bot Framework WebChat](https://learn.microsoft.com/azure/bot-service/bot-service-channel-connect-webchat)
+- [Direct Line API](https://learn.microsoft.com/azure/bot-service/rest-api/bot-framework-rest-direct-line-3-0-concepts)
+
+**Declarative Agents & Skills**:
+- [Declarative agents](https://learn.microsoft.com/microsoft-365-copilot/extensibility/declarative-agent-manifest)
+- [Agent builder](https://learn.microsoft.com/microsoft-365-copilot/extensibility/build-declarative-agents)
+- [API plugins](https://learn.microsoft.com/microsoft-365-copilot/extensibility/api-plugin-overview)
+- [Copilot connectors](https://learn.microsoft.com/microsoft-365-copilot/extensibility/overview-business-applications)
+
+**Microsoft 365 Knowledge & Search**:
+- [Microsoft Search API](https://learn.microsoft.com/graph/search-concept-overview)
+- [Knowledge connectors](https://learn.microsoft.com/microsoftsearch/connectors-overview)
+- [Graph Connectors](https://learn.microsoft.com/graph/connecting-external-content-connectors-overview)
+- [Search external content](https://learn.microsoft.com/graph/search-concept-custom-types)
+
+**Monitoring & Security**:
+- [Application Insights](https://learn.microsoft.com/azure/azure-monitor/app/app-insights-overview)
+- [Azure Key Vault](https://learn.microsoft.com/azure/key-vault/)
+- [Azure RBAC](https://learn.microsoft.com/azure/role-based-access-control/)
+- [Azure security baseline](https://learn.microsoft.com/security/benchmark/azure/)
 
 ---
 

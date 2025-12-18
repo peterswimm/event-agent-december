@@ -15,7 +15,7 @@ pip install -r requirements.txt
 python agent.py recommend --interests "agents" --top 3
 ```
 
-✅ **147 tests passing** | 📚 **Complete documentation** | 🐳 **Docker ready**
+✅ **190+ tests passing** | 📚 **Complete documentation** | 🐳 **Docker ready** | 🔌 **Unified adapters**
 
 ---
 
@@ -138,6 +138,87 @@ docker compose logs -f
 
 ---
 
+### 6️⃣ Microsoft Foundry (Azure AI Foundry)
+
+**Best for**: Production AI orchestration, model evaluation, multi-agent systems
+
+**Prerequisites**:
+- Azure subscription
+- Azure CLI installed
+- Contributor role on subscription
+
+**Deploy infrastructure** (10 minutes):
+```bash
+# Login to Azure
+az login
+
+# Deploy Foundry resources
+az deployment group create \
+  --resource-group eventkit-foundry-rg \
+  --template-file infra/main.bicep \
+  --parameters deployFoundry=true openAIResourceName=eventkit-openai
+
+# Get deployment outputs
+az deployment group show \
+  --resource-group eventkit-foundry-rg \
+  --name main \
+  --query properties.outputs
+```
+
+**Install Agent Framework SDK** (--pre flag required):
+```bash
+pip install agent-framework-azure-ai --pre
+pip install promptflow promptflow-azure
+```
+
+**Configure environment**:
+```bash
+# Set Foundry environment variables
+export FOUNDRY_ENABLED=true
+export FOUNDRY_PROJECT_ENDPOINT="https://eastus.api.azureml.ms"
+export FOUNDRY_SUBSCRIPTION_ID="your-subscription-id"
+export FOUNDRY_RESOURCE_GROUP="eventkit-foundry-rg"
+export FOUNDRY_PROJECT_NAME="eventkit-prod-project"
+export FOUNDRY_MODEL_DEPLOYMENT="gpt-4o"
+```
+
+**Test Agent Framework**:
+```python
+from agent_framework_adapter import EventKitAgentFramework
+import asyncio
+
+async def test():
+    agent = EventKitAgentFramework()
+    response = await agent.run("recommend sessions about AI agents and machine learning")
+    print(response)
+
+asyncio.run(test())
+```
+
+**Deploy Prompt Flow**:
+```bash
+# Test flow locally
+pf flow test --flow flow.dag.yaml --inputs user_message="recommend AI sessions"
+
+# Deploy to Foundry
+pf flow create \
+  --flow flow.dag.yaml \
+  --workspace-name eventkit-prod-project \
+  --resource-group eventkit-foundry-rg
+```
+
+**What you get**:
+- ✅ AI Hub and Project for centralized management
+- ✅ GPT-4o and GPT-3.5-turbo model deployments
+- ✅ Prompt Flow orchestration (4-node workflow)
+- ✅ Evaluation framework (precision, recall, F1, relevance scoring)
+- ✅ Managed compute and auto-scaling
+- ✅ Enterprise security (RBAC, Key Vault integration)
+
+📖 **Complete guide**: [docs/foundry-deployment.md](docs/foundry-deployment.md)
+
+---
+
 ## 🔧 Microsoft Graph Integration (Optional)
 
 **Best for**: Calendar-based recommendations, real user data
@@ -175,6 +256,7 @@ curl "http://localhost:8010/recommend-graph?interests=ai+safety&top=3&userId=use
 | **Bot Emulator** | 5 min | Conversation testing | ❌ | ✅ |
 | **Teams (ngrok)** | 15 min | Teams integration | ✅ | ✅ |
 | **Docker** | 5 min | Production-like | ❌ | ✅ |
+| **Foundry** | 15 min | AI orchestration | ✅ | ✅ |
 | **Copilot Studio** | 30 min | Copilot testing | ✅ | ✅ |
 | **Azure Production** | 60 min | Live deployment | ✅ | ✅ |
 
@@ -190,18 +272,17 @@ curl "http://localhost:8010/recommend-graph?interests=ai+safety&top=3&userId=use
 - **[LOCAL_TESTING.md](LOCAL_TESTING.md)** - Multi-channel testing guide
 
 ### Integration Guides
-- **[docs/agents-sdk-setup.md](docs/agents-sdk-setup.md)** - Teams/Copilot integration (650+ lines)
+
+- **[docs/agents-sdk-setup.md](docs/agents-sdk-setup.md)** - Teams/Copilot integration (690+ lines)
 - **[docs/deployment-guide.md](docs/deployment-guide.md)** - Production deployment (500+ lines)
-- **[TEAMS_QUICK_REFERENCE.md](TEAMS_QUICK_REFERENCE.md)** - Bot commands reference
+- **[docs/UNIFIED_ADAPTER_ARCHITECTURE.md](docs/UNIFIED_ADAPTER_ARCHITECTURE.md)** ⭐ - Unified adapter pattern
 
 ### Development
+
 - **[DEVELOPMENT.md](DEVELOPMENT.md)** - Developer guide
 - **[docs/api-guide.md](docs/api-guide.md)** - API reference (100+ examples)
 - **[docs/technical-guide.md](docs/technical-guide.md)** - Architecture deep dive
-
-### Project Status
-- **[PHASE3_COMPLETION.md](PHASE3_COMPLETION.md)** - Implementation status
-- **[ROADMAP.md](ROADMAP.md)** - Roadmap & progress tracking
+- **[docs/TESTING_GUIDE.md](docs/TESTING_GUIDE.md)** - Testing guide (190+ tests)
 
 ---
 
@@ -235,11 +316,11 @@ After editing, rerun any command - changes take effect immediately.
 ## 🧪 Run Tests
 
 ```bash
-# All tests (147 passing)
+# All tests (190+ passing)
 python -m pytest tests -v
 
 # Specific test file
-python -m pytest tests/test_agents_sdk.py -v
+python -m pytest tests/test_unified_adapters.py -v
 
 # With coverage
 python -m pytest tests --cov=. --cov-report=html
@@ -329,4 +410,4 @@ python -m pytest tests/test_agents_sdk.py::test_adapter_recommend -v
 
 ---
 
-**Need help?** Check [docs/troubleshooting.md](docs/troubleshooting.md) or [PHASE3_INDEX.md](PHASE3_INDEX.md)
+**More help**: [docs/troubleshooting.md](docs/troubleshooting.md) or [README.md](README.md)

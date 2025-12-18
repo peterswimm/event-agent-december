@@ -1,0 +1,178 @@
+{
+  // Python Configuration
+  "python.defaultInterpreterPath": "${workspaceFolder}/.venv/Scripts/python.exe",
+  "python.terminal.activateEnvironment": true,
+  "python.terminal.activateEnvInCurrentTerminal": true,
+
+  // Testing
+  "python.testing.pytestEnabled": true,
+  "python.testing.unittestEnabled": false,
+  "python.testing.pytestArgs": [
+    "tests",
+    "-v",
+    "--cov=.",
+    "--cov-report=html",
+    "--cov-report=term"
+  ],
+  "python.testing.autoTestDiscoverOnSaveEnabled": true,
+
+  // Linting & Formatting
+  "python.linting.enabled": true,
+  "python.linting.pylintEnabled": true,
+  "python.linting.pylintArgs": [
+    "--max-line-length=100",
+    "--disable=C0111,R0903,W0212"
+  ],
+  "python.formatting.provider": "none",
+  "[python]": {
+    "editor.defaultFormatter": "ms-python.black-formatter",
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": "explicit"
+    },
+    "editor.rulers": [88, 100]
+  },
+  "black-formatter.args": [
+    "--line-length=100"
+  ],
+  "isort.args": [
+    "--profile=black",
+    "--line-length=100"
+  ],
+
+  // Editor Settings
+  "editor.bracketPairColorization.enabled": true,
+  "editor.guides.bracketPairs": true,
+  "editor.inlineSuggest.enabled": true,
+  "editor.suggestSelection": "first",
+  "editor.tabSize": 4,
+  "editor.insertSpaces": true,
+  "editor.trimAutoWhitespace": true,
+  "files.trimTrailingWhitespace": true,
+  "files.insertFinalNewline": true,
+  "files.eol": "\n",
+
+  // File Associations
+  "files.associations": {
+    "*.bicep": "bicep",
+    "*.bicepparam": "bicepparam",
+    "*.jsonl": "jsonl",
+    "*.http": "http",
+    "agent.json": "jsonc",
+    "agent-declaration.json": "jsonc",
+    "MANIFEST.yml": "yaml"
+  },
+
+  // Files to Exclude from Explorer
+  "files.exclude": {
+    "**/__pycache__": true,
+    "**/*.pyc": true,
+    "**/.pytest_cache": true,
+    "**/.coverage": true,
+    "**/htmlcov": true,
+    "**/*.egg-info": true,
+    "**/.mypy_cache": true,
+    "**/.ruff_cache": true
+  },
+
+  // Search Exclusions
+  "search.exclude": {
+    "**/__pycache__": true,
+    "**/*.pyc": true,
+    "**/.pytest_cache": true,
+    "**/.coverage": true,
+    "**/htmlcov": true,
+    "**/*.egg-info": true,
+    "**/telemetry.jsonl": true
+  },
+
+  // Terminal Configuration
+  "terminal.integrated.defaultProfile.windows": "PowerShell",
+  "terminal.integrated.env.windows": {
+    "PYTHONPATH": "${workspaceFolder}"
+  },
+
+  // REST Client Configuration
+  "rest-client.environmentVariables": {
+    "$shared": {
+      "host": "http://localhost:8010",
+      "botHost": "http://localhost:3978"
+    },
+    "local": {
+      "host": "http://localhost:8010",
+      "botHost": "http://localhost:3978"
+    },
+    "docker": {
+      "host": "http://localhost:8010",
+      "botHost": "http://localhost:3978"
+    }
+  },
+
+  // Azure Configuration
+  "azureFunctions.projectRuntime": "~4",
+  "azureFunctions.projectLanguage": "Python",
+  "azureFunctions.pythonVenv": ".venv",
+
+  // Git Configuration
+  "git.enableSmartCommit": true,
+  "git.confirmSync": false,
+  "git.autofetch": true,
+
+  // GitHub Actions
+  "githubActions.workflows.pinned.workflows": [
+    ".github/workflows/test.yml",
+    ".github/workflows/lint.yml",
+    ".github/workflows/deploy.yml"
+  ],
+
+  // Markdown
+  "markdown.extension.toc.levels": "2..6",
+  "markdown.extension.print.absoluteImgPath": false,
+  "[markdown]": {
+    "editor.defaultFormatter": "yzhang.markdown-all-in-one",
+    "editor.formatOnSave": false,
+    "editor.wordWrap": "on",
+    "editor.quickSuggestions": {
+      "comments": "on",
+      "strings": "on",
+      "other": "on"
+    }
+  },
+
+  // YAML
+  "yaml.schemas": {
+    "https://json.schemastore.org/github-workflow.json": ".github/workflows/*.yml",
+    "https://json.schemastore.org/pre-commit-config.json": ".pre-commit-config.yaml"
+  },
+
+  // Spell Checker
+  "cSpell.words": [
+    "aiohttp",
+    "appservice",
+    "bicep",
+    "bicepparam",
+    "botbuilder",
+    "botframework",
+    "copilot",
+    "eventhub",
+    "eventkit",
+    "foundry",
+    "jsonl",
+    "msft",
+    "msgraph",
+    "pytest",
+    "pylint",
+    "pyproject",
+    "telemetry",
+    "venv"
+  ],
+
+  // Error Lens
+  "errorLens.enabledDiagnosticLevels": [
+    "error",
+    "warning"
+  ],
+  "errorLens.excludeBySource": [
+    "cSpell"
+  ]
+}
